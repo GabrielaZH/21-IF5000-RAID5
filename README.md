@@ -1,12 +1,7 @@
 
 # 21-IF500-TFTP
 *** 
-This project is based on the operation of the TFTP protocol.
-The client sends images to the server by means of random byte packets
-the server receives them, sends a confirmation and rebuilds the image.
-The image is stored on the server side in a folder with the client's name. 
-If the client needs to see the saved images, in this case the server does 
-the sending in the same way.
+saSEARCH is a client application that connects to Controller Node to find the books and metadata on the RAID. This application requires entering the words of the search argument and returns the list of books that match the words entered using the metadata as a base. In addition, according to the search result, it shows the list of books and displays their content when any of these are selected.
 *** 
 ### Application functionalities:
 
