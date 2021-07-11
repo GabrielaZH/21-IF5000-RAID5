@@ -34,19 +34,19 @@ public class ClientController {
         Map<String,Object> response = new HashMap<>();
 
         Send send= new Send();
-        send.sendRequest("hola");
+        send.sendFile("C:\\ar.txt");
 
 
         return new ResponseEntity<Map<String, Object>>( response, HttpStatus.CREATED);
     }
 
-//    @RequestMapping(value = "/receiveFile")
-//    public ResponseEntity<?> receiveFile(/*@RequestParam("file") MultipartFile file*/) throws FileNotFoundException {
-//
-//        Map<String,Object> response = new HashMap<>();
-//        Send send= new Send();
-//        send.sendRequest("nombre archivo");
-//
-//        return new ResponseEntity<Map<String, Object>>( response, HttpStatus.CREATED);
-//    }
+    @RequestMapping(value = "/receiveFile")
+    public ResponseEntity<?> receiveFile(/*@RequestParam("file") MultipartFile file*/) throws FileNotFoundException {
+
+        Map<String,Object> response = new HashMap<>();
+        Send send= new Send();
+        send.getFile("text1.txt");
+
+        return new ResponseEntity<Map<String, Object>>( response, HttpStatus.CREATED);
+    }
 }
