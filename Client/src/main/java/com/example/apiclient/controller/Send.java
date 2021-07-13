@@ -1,79 +1,72 @@
 package com.example.apiclient.controller;
 
-import javax.swing.*;
+import com.example.apiclient.huffman.HuffmanEncoding;
+import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.net.*;
 
 public class Send {
 
     private final int PORT = 16789;
-    private String HOST = "192.168.1.5";//TODO cambiar a que identifique el host donde esta corriendo
+    private String HOST ="192.168.1.5";//TODO cambiar a que identifique el host donde esta corriendo
     DatagramSocket socket = null;
+    String fileNameReceive="";
+    String pathFileSave="C:\\21-IF5000-RAID5\\Client\\files\\";
+    String pathFileReceive= "C:\\21-IF5000-RAID5\\Client\\filesReceive\\";
+    String pathFile="";
+    HuffmanEncoding huffman = new HuffmanEncoding();//encode the file
 
 
-    public void sendFile(String routeFile){
-
+    public void sendFile(MultipartFile file) throws IOException {
         try {
             socket = new DatagramSocket();
-        }
-        catch(SocketException se){}
+            Thread r = new Thread(new messageReceiver(socket));
+            Thread s = new Thread(new FileSender(socket,HOST));
+            r.start();
+            s.start();
 
-        Thread r = new Thread(new messageReceiver(socket));
-        Thread s = new Thread(new FileSender(socket,HOST));
-        r.start();
-        s.start();
+            //send file name
+            sendData(file.getName());
 
-            try {
+            //send data file
+            saveFile(file,pathFileSave);
+            File fileSaved= new File(pathFileSave+file.getName());
+            File fileOut= new File(pathFileSave+"out.txt");
+            huffman.encoding(fileSaved.getPath(),pathFileSave+"out.txt");
+            File finalFile= new File(pathFileSave+"out.txt");
+            sendPacket(finalFile);
 
-
-                FileInputStream source = new FileInputStream(routeFile);
-                byte buf[]=new byte[1024];
-                int i=0;
-                while(source.available()!=0)
-                {
-                    buf[i]=(byte)source.read();
-                    i++;
-                }
-                source.close();
-                InetAddress address = InetAddress.getByName(HOST);
-                DatagramPacket packet = new DatagramPacket(buf, buf.length, address, PORT);
-                socket.send(packet);
             } catch(IOException ioe){
-                System.out.println("Server Offline...");
-                JOptionPane.showMessageDialog(null, "Server Offline...");
-                System.exit(0);
+                throw ioe;
             } catch(NullPointerException npe){
+                throw npe;
             }
-
     }
 
 
-    public void getFile(String fileName){
 
+    public File getFile(String fileName) throws IOException {
+        fileNameReceive=fileName;
         try {
             socket = new DatagramSocket();
-        }
-        catch(SocketException se){}
+            Thread r = new Thread(new FileReceiver(socket));
+            Thread s = new Thread(new FileSender(socket,HOST));
+            r.start();
+            s.start();
 
-        Thread r = new Thread(new FileReceiver(socket));
-        Thread s = new Thread(new FileSender(socket,HOST));
-        r.start();
-        s.start();
+            //send file name
+            sendData(fileName);
 
-        try {
-            String request= "receive"+fileName;
-            byte bufRequest[]=request.getBytes();
-            InetAddress addressRequest = InetAddress.getByName(HOST);
-            DatagramPacket packetRequest = new DatagramPacket(bufRequest, bufRequest.length, addressRequest, PORT);
-            socket.send(packetRequest);
+            //send type request
+            sendData("receiveRequest");
 
         } catch(IOException ioe){
-            System.out.println("Server Offline...");
-            JOptionPane.showMessageDialog(null, "Server Offline...");
-            System.exit(0);
+            throw ioe;
         } catch(NullPointerException npe){
+            throw npe;
         }
-
+        File fileReceived= new File(pathFileSave+"tempNameFile.txt");
+        return fileReceived;
     }
 
 
@@ -88,27 +81,10 @@ public class Send {
             hostname = h;
         }
 
-        public void sendMessage(String s){
-            try{
-                byte buf[] = s.getBytes();
-                InetAddress address = InetAddress.getByName(hostname);
-                DatagramPacket packet = new DatagramPacket(buf, buf.length, address, PORT);
-                sock.send(packet);
-            }
-            catch(UnknownHostException uhe){
-                System.out.println(uhe.getMessage());
-            }
-            catch(IOException ioe){
-                System.out.println(ioe.getMessage());
-            }
-        }
-
-
         public void run() {
             boolean connected = false;
             do {
                 try {
-//               sendMessage("Client Connected...");
                     connected = true;
                 }
                 catch (Exception e) {
@@ -130,10 +106,9 @@ public class Send {
     }
 
 
-    class messageReceiver implements Runnable {
+   public class messageReceiver implements Runnable {
         DatagramSocket sock;
         byte buf[];
-
         messageReceiver(DatagramSocket s) {
             sock = s;
             buf = new byte[1024];
@@ -144,14 +119,15 @@ public class Send {
                 try {
                     DatagramPacket packet = new DatagramPacket(buf, buf.length);
                     sock.receive(packet);
-                    String received = new String(packet.getData(), packet.getOffset(), packet.getLength());
-                    System.out.println(received);
+                    String  received = new String(packet.getData(), packet.getOffset(), packet.getLength());
+                    System.out.println(received.trim());
                 }
                 catch(Exception e) {
                     System.err.println(e);
                 }
             }
         }//end of run
+
     }//end of ClassMessageReceiver
 
     class FileReceiver implements Runnable {
@@ -169,17 +145,22 @@ public class Send {
                     DatagramPacket packet = new DatagramPacket(buf, buf.length);
                     sock.receive(packet);
                     String received = new String(packet.getData(), packet.getOffset(), packet.getLength());
-                    String receivedMsg = new String(buf, buf.length);
-                    FileWriter fw = new FileWriter(new File("text1RecibidoCliente.txt"));
-                    fw.write(receivedMsg.trim());
-                    fw.flush();
-                    fw.close();
 
-//                    FileInputStream fileInputStream= new FileInputStream("text1RecibidoCliente.txt");
-//                    fileInputStream.read(buf);
-//                    fileInputStream.close();
+                    String pathFileEncode =pathFileReceive+"fileEncode.txt";
+                    File fileEncode = new File(pathFileEncode);
 
-                    System.out.println(received);
+                    try (OutputStream os = new FileOutputStream(fileEncode)) {
+                        os.write(buf);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
+                    }
+                    String pathFileDecode=pathFileReceive+fileNameReceive ;
+                    File file = new File(pathFileDecode);
+                    HuffmanEncoding huffman = new HuffmanEncoding();
+                    huffman.decode(pathFileEncode,pathFileDecode);
+
+                    pathFile=pathFileDecode;
+                    System.out.println(received.trim());
                 }
                 catch(Exception e) {
                     System.err.println(e);
@@ -188,7 +169,52 @@ public class Send {
         }//end of run
     }//end of ClassFileReceiver
 
+    public void saveFile(MultipartFile file, String path)  {
+        File fileToSave = new File(path+file.getName());
+        try (OutputStream os = new FileOutputStream(fileToSave)) {
+            InputStream initialStream = file.getInputStream();
+            byte[] buffer = new byte[initialStream.available()];
+            initialStream.read(buffer);
+            os.write(buffer);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
+        }
 
+    }
+    public void sendData(String fileName) throws IOException {
+        writeInFile(fileName.getBytes(),pathFileSave+"tempNameFile.txt");
+        File fileSaved= new File(pathFileSave+"tempNameFile.txt");
+        File fileOut= new File(pathFileSave+"out.txt");
+        huffman.encoding(fileSaved.getPath(),pathFileSave+"out.txt");
+        File finalFile= new File(pathFileSave+"out.txt");
+        sendPacket(finalFile);
+    }
+
+    public void sendPacket(File finalFile) throws IOException {
+        FileInputStream source = new FileInputStream(finalFile);
+        byte buf[]=new byte[1024];
+        int i=0;
+        while(source.available()!=0)
+        {
+            buf[i]=(byte)source.read();
+            i++;
+        }
+        source.close();
+        InetAddress address = InetAddress.getByName(HOST);
+        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, PORT);
+        socket.send(packet);
+    }
+    public File writeInFile(byte[] text, String path)  {
+        File fileToSave = new File(path);
+        File finalFile;
+        try (OutputStream os = new FileOutputStream(fileToSave)) {
+            os.write(text);
+            finalFile = new File(path);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
+        }
+        return finalFile;
+    }
 
 }//end class
 
