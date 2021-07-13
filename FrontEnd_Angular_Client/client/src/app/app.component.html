@@ -1,0 +1,48 @@
+<app-header></app-header>
+
+<div class ="container">
+
+<router-outlet></router-outlet>
+
+     <form>
+        <div class="formulario__grupo col-md-12">
+            <label class="form-label">File (.txt)</label>
+            <input id="imagenFile" (change)="selectFile($event)" onChange="document.getElementById().src = window.URL.createObjectURL(this.files[0])" type="file" title="TXT" class="form-control mt-0" name="image" accept="file/.txt">
+        </div>
+        <br/>
+        <div class="col-md-6">
+            <button type="button" (click)="upload()"  class="btn btn-primary">Upload</button>
+        </div>
+        <br>
+    </form>
+    <div class="card">
+        <div class="table-responsive">
+        <table class=' table'>
+            <thead >
+            <tr>
+            <th>Número</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Acción</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let book of bookList | async">
+                    <td>{{ book.id }}</td>
+                    <td>{{ book.name}}</td>
+                    <td>{{ book.description }}</td>
+                    <td>
+                      <button class="btn-primary btn"><i class="fas fa-eye"></i></button>
+                    </td>
+                  </tr>
+            </tbody>
+        </table>
+        </div>
+
+    </div>
+
+</div>
+
+<app-footer></app-footer>
+
+

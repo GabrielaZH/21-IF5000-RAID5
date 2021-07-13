@@ -9,6 +9,9 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 
@@ -25,17 +28,23 @@ public class ClientController {
     }
 
     @RequestMapping(value = "/uploadFile")
-    public ResponseEntity<?> uploadFile(/*@RequestParam("file") MultipartFile file*/) throws IOException {
-
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file)  {
         Map<String,Object> response = new HashMap<>();
+        try {
+            try {
+                Send send= new Send();
+                MultipartFile multipartFile = new MockMultipartFile((file.getOriginalFilename()), file.getInputStream());
+                send.sendFile(multipartFile);
+            } catch (Exception e) {
+                throw new RuntimeException("FAIL!");
+            }
+            response.put("message","Successfully uploaded!");
+            return new ResponseEntity<Map<String,Object>>(response,HttpStatus.OK);
+        } catch (Exception e) {
+            response.put("message",e.getMessage().concat(":").concat(e.getMessage()));
+            return new ResponseEntity<Map<String,Object>>(response,HttpStatus.CONFLICT);
+        }
 
-        Send send= new Send();
-        File file = new File("C:\\are.txt");
-        FileInputStream inputStream = new FileInputStream(file);
-        MultipartFile multipartFile = new MockMultipartFile(file.getName(), inputStream);
-        send.sendFile(multipartFile);
-
-        return new ResponseEntity<Map<String, Object>>( response, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/receiveFile")
