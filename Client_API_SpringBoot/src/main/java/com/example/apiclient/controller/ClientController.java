@@ -28,12 +28,15 @@ public class ClientController {
     }
 
     @RequestMapping(value = "/uploadFile")
-    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file)  {
+    public ResponseEntity<?> uploadFile(/*@RequestParam("file") MultipartFile file*/)  {
         Map<String,Object> response = new HashMap<>();
         try {
             try {
                 Send send= new Send();
-                MultipartFile multipartFile = new MockMultipartFile((file.getOriginalFilename()), file.getInputStream());
+                //MultipartFile multipartFile = new MockMultipartFile((file.getOriginalFilename()), file.getInputStream());
+                File file = new File("C:\\are.txt");
+                FileInputStream inputStream = new FileInputStream(file);
+                MultipartFile multipartFile = new MockMultipartFile(file.getName(), inputStream);
                 send.sendFile(multipartFile);
             } catch (Exception e) {
                 throw new RuntimeException("FAIL!");
