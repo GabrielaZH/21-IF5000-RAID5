@@ -324,7 +324,7 @@ public class Main {
 
             //send.sendFile(new File("C:\\21-IF5000-RAID5\\Processos_Disk_Nodes_Java\\files\\PRUEBA.txt"));
             //send.sendFile(new File("C:\\21-IF5000-RAID5\\Processos_Disk_Nodes_Java\\files\\MAMAHUEVO.txt"));
-            //send.getFile("MAMAHUEVO.txt");
+            send.getFile("MAMAHUEVO.txt");
             send.getFile("PRUEBA.txt");
         } catch (Exception e) {
             throw new RuntimeException("FAIL!");

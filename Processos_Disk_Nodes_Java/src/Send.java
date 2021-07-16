@@ -6,14 +6,14 @@ import java.util.Random;
 public class Send {
 
     private final int PORT = 16789;
-    private String HOST = "192.168.56.1";
+    private String HOST = "192.168.1.5";
     DatagramSocket socket = null;
     String fileNameReceive="";
     String pathFileSave="C:\\21-IF5000-RAID5\\Processos_Disk_Nodes_Java\\files\\";
     String pathFileReceive= "C:\\21-IF5000-RAID5\\Processos_Disk_Nodes_Java\\filesReceive\\";
     String pathFile="";
     HuffmanEncoding huffman = new HuffmanEncoding();//encode the file
-
+    String pathFileDecode="";
     public void sendFile(File file) throws IOException {
         try {
             socket = new DatagramSocket();
@@ -42,10 +42,11 @@ public class Send {
 
 
     public void getFile(String fileName) throws IOException {
-        fileNameReceive=fileName;
+       //fileNameReceive=fileName;
+
         try {
             socket = new DatagramSocket();
-            Thread r = new Thread(new FileReceiver(socket));
+            Thread r = new Thread(new FileReceiver(socket,fileName));
             Thread s = new Thread(new FileSender(socket,HOST));
             r.start();
             s.start();
@@ -126,23 +127,20 @@ public class Send {
     class FileReceiver implements Runnable {
         DatagramSocket sock;
         byte buf[];
-
-        FileReceiver(DatagramSocket s) {
+        String finalName;
+        FileReceiver(DatagramSocket s, String name) {
             sock = s;
             buf = new byte[60000];
+            finalName=name;
         }
 
+
         public void run() {
-            while (true) {
                 try {
                     DatagramPacket packet = new DatagramPacket(buf, buf.length);
                     sock.receive(packet);
-                    String received = new String(packet.getData(), packet.getOffset(), packet.getLength());
 
-                    Random random = new Random();
-                    Integer numberRandom = random.nextInt(20);
-
-                    String pathFileEncode =pathFileReceive+"fileEncode.txt";
+                    String pathFileEncode =pathFileReceive+"encode.txt";
                     File fileEncode = new File(pathFileEncode);
 
                     try (OutputStream os = new FileOutputStream(fileEncode)) {
@@ -150,10 +148,8 @@ public class Send {
                     } catch (Exception e) {
                         throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
                     }
-
-
-                    String pathFileDecode=pathFileReceive+fileNameReceive;
-                   // File file = new File(pathFileDecode);
+                    
+                    pathFileDecode=pathFileReceive+finalName;
                     HuffmanEncoding huffman = new HuffmanEncoding();
                     huffman.decode(pathFileEncode,pathFileDecode);
 
@@ -161,8 +157,8 @@ public class Send {
                 catch(Exception e) {
                     System.err.println(e);
                 }
-            }
-        }//end of run
+
+       }//end of run
     }//end of ClassFileReceiver
 
 //    public void saveFile(MultipartFile file, String path)  {
