@@ -301,24 +301,36 @@ public class Main {
     //endregion
 
     public static void main(String[] args) throws FileNotFoundException {
-        //clean();
-        DISK.add("DISK0");
-        DISK.add("DISK1");
-        DISK.add("DISK2");
-        DISK.add("DISK3");
-        DISK.add("DISK4");
-        DISK.add("DISK5");
-        DISK.add("DISK6");
-        DISK.add("DISK7");
-        DISK.add("DISK8");
+//        DISK.add("DISK0");
+//        DISK.add("DISK1");
+//        DISK.add("DISK2");
+//        DISK.add("DISK3");
+//        DISK.add("DISK4");
+//        DISK.add("DISK5");
+//        DISK.add("DISK6");
+//        DISK.add("DISK7");
+//        DISK.add("DISK8");
+//
+//        lastDisk = DISK.get(DISK.size()-1);
+//        createDisks(DISK);
+//        byte[] fileLikeByte = parseFileToByte(new File(PATH + "Hino.txt"));
+//        saveFileWithRAID5(fileLikeByte,DISK.size());
+//        deleteDisk("DISK5");
+//        findDiskCorrupted(DISK);
+//        remakeFile(DISK);
 
-        lastDisk = DISK.get(DISK.size()-1);
-        createDisks(DISK);
-        byte[] fileLikeByte = parseFileToByte(new File(PATH + "Hino.txt"));
-        saveFileWithRAID5(fileLikeByte,DISK.size());
-        deleteDisk("DISK5");
-        findDiskCorrupted(DISK);
-        remakeFile(DISK);
+        try {
+            Send send= new Send();
+
+            //send.sendFile(new File("C:\\21-IF5000-RAID5\\Processos_Disk_Nodes_Java\\files\\PRUEBA.txt"));
+            //send.sendFile(new File("C:\\21-IF5000-RAID5\\Processos_Disk_Nodes_Java\\files\\MAMAHUEVO.txt"));
+            //send.getFile("MAMAHUEVO.txt");
+            send.getFile("PRUEBA.txt");
+        } catch (Exception e) {
+            throw new RuntimeException("FAIL!");
+        }
+
+
     }
 }
 

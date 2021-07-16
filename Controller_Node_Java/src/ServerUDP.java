@@ -18,17 +18,15 @@ public class ServerUDP {
    DatagramPacket udpPacket;
    String filename="";
    byte[] byteBuffer;
-   String pathFiles="C:\\21-IF5000-RAID5\\ServerUDP\\src\\files\\";
+   String pathFiles="C:\\21-IF5000-RAID5\\Controller_Node_Java\\src\\files\\";
    public ServerUDP() {
-
       try {
-         System.out.println(InetAddress.getLocalHost());
+         System.out.println(InetAddress.getLocalHost().getHostAddress());
       } catch (UnknownHostException uhe) {
          System.err.println(uhe.getMessage());
       }
 
       try {
-
          //UDP
          udpSocket = new DatagramSocket(PORT);
          clientIPs = new ArrayList();
@@ -60,7 +58,7 @@ public class ServerUDP {
             try {
 
                // sets/resets buffer size
-               byteBuffer = new byte[1024];
+               byteBuffer = new byte[60000];
 
                //create new Packet
                udpPacket = new DatagramPacket(byteBuffer, byteBuffer.length);
@@ -74,9 +72,13 @@ public class ServerUDP {
                 currentClientIP = udpPacket.getAddress();
                 currentClientPort = udpPacket.getPort();
                 String response ="";
-               String receivedMsg = "";
+                String receivedMsg = "";
+                //Send send= new Send();
 
                receivedMsg= readFile(decodeFile(pathFiles+"fileEncode.txt",pathFiles+"fileDecode.txt"));//read data in file
+
+               //TODO Recibir archivo con numero de nodos
+               //int numNodos= 5;
 
                // verify if the message is the name file
                if(receivedMsg.contains(".txt")){
@@ -86,13 +88,20 @@ public class ServerUDP {
                } else if(!receivedMsg.contains("receiveRequest")){
                   decodeFile(pathFiles+"fileEncode.txt",pathFiles+filename.trim());
                   response = "[" + newTimeStamp + "] IP:" + currentClientIP + " : File Receive from server" ;
+
+                  //TODO
+//                  send.sendFile(new File("C:\\RAID5\\PRUEBA.txt"));
+//                  send.sendFile(new File("C:\\RAID5\\PRUEBA.txt"));
+
+
+
                   sendMessageToClients( (response).getBytes());
 
                   //verify if the message is send the file
                }else if (receivedMsg.contains("receiveRequest")){
                   File finalFile= new File(encodeFile(pathFiles+"fileEncode.txt",pathFiles+filename.trim()));
                   FileInputStream source = new FileInputStream(finalFile);
-                  byte buf[]=new byte[1024];
+                  byte buf[]=new byte[60000];
                   int i=0;
                   while(source.available()!=0)
                   {
@@ -111,8 +120,6 @@ public class ServerUDP {
 
       }//end of run 
    }//end of UDP thread
-
-
 
 
    public void sendMessageToClients(byte[] outgoingByte)  {
@@ -151,8 +158,6 @@ public class ServerUDP {
       }
    }
 
-
-
 public String decodeFile(String pathFileEncode, String pathFileDecode){
    File fileEncode = new File(pathFileEncode);
    try (OutputStream os = new FileOutputStream(fileEncode)) {
@@ -179,7 +184,6 @@ public String encodeFile(String pathFileEncoded, String pathFileDecodeNameFile){
               new SimpleDateFormat("hh:mm:ss").format(Calendar.getInstance().getTime());
       return time;
    }
-
 
    public String readFile(String path) {
     String text="";
