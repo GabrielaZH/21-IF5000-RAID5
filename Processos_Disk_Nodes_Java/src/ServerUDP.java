@@ -7,7 +7,7 @@ import java.util.*;
 import java.text.SimpleDateFormat;
 
 public class ServerUDP {
-   final int PORT = 16789;
+   final int PORT = 16787;
    public DatagramSocket udpSocket; // Socket open for UDP
    public ArrayList<InetAddress> clientIPs; //List of IP addresses
    public ArrayList<Integer> clientPorts; //List of Ports
@@ -18,7 +18,7 @@ public class ServerUDP {
    DatagramPacket udpPacket;
    String filename="";
    byte[] byteBuffer;
-   String pathFiles="C:\\21-IF5000-RAID5\\Controller_Node_Java\\filesReceive\\";
+   String pathFiles="C:\\21-IF5000-RAID5\\Processos_Disk_Nodes_Java\\filesReceive\\";
    public ServerUDP() {
       try {
          System.out.println(InetAddress.getLocalHost().getHostAddress());
@@ -73,27 +73,22 @@ public class ServerUDP {
                 currentClientPort = udpPacket.getPort();
                 String response ="";
                 String receivedMsg = "";
-
+                //Send send= new Send();
 
                receivedMsg= readFile(decodeFile(pathFiles+"fileEncode.txt",pathFiles+"fileDecode.txt"));//read data in file
 
                //TODO Recibir archivo con numero de nodos
-               int numNodos= 5;
+               //int numNodos= 5;
 
                // verify if the message is the name file
                if(receivedMsg.contains(".txt")){
                   filename=receivedMsg.trim();
-                  filename = filename.replaceAll("\uFFFF.txt","");
+                  filename = filename.replaceAll(".txt","");
 
                   //verify if the message is the content file for save
                } else if(!receivedMsg.contains("receiveRequest")){
                   decodeFile(pathFiles+"fileEncode.txt",pathFiles+filename+".txt");
                   response = "[" + newTimeStamp + "] IP:" + currentClientIP + " : File Receive from server" ;
-
-                  Send send= new Send();
-                  send.sendFile(new File("C:\\21-IF5000-RAID5\\Controller_Node_Java\\filesReceive\\MAMAHUEVO.txt"));
-                  send.sendFile(new File("C:\\21-IF5000-RAID5\\Controller_Node_Java\\filesReceive\\PRUEBA.txt"));
-
                   sendMessageToClients( (response).getBytes());
 
                   //verify if the message is send the file

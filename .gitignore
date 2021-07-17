@@ -1,8 +1,8 @@
 node_modules/
 
-# exclude everything
-images/*
+filesReceive/*
+files/*
 
-# exception to the rule
-!images/.gitkeep
+!filesReceive/.gitkeep
 
+!files/.gitkeep
