@@ -17,6 +17,7 @@ public class ServerUDP {
    int currentClientPort ;
    DatagramPacket udpPacket;
    String filename="";
+   int numNodos;
    byte[] byteBuffer;
    String pathFiles="C:\\21-IF5000-RAID5\\Controller_Node_Java\\filesReceive\\";
    public ServerUDP() {
@@ -69,19 +70,24 @@ public class ServerUDP {
                String newTimeStamp = "[" + getCurrentTime() + "]";
 
                //Get the IP and Port of where the message came from
-                currentClientIP = udpPacket.getAddress();
-                currentClientPort = udpPacket.getPort();
-                String response ="";
-                String receivedMsg = "";
+               currentClientIP = udpPacket.getAddress();
+               currentClientPort = udpPacket.getPort();
+               String response = "";
+               String receivedMsg = "";
 
 
-               receivedMsg= readFile(decodeFile(pathFiles+"fileEncode.txt",pathFiles+"fileDecode.txt"));//read data in file
+               receivedMsg = readFile(decodeFile(pathFiles + "fileEncode.txt", pathFiles + "fileDecode.txt"));//read data in file
 
                //TODO Recibir archivo con numero de nodos
-               int numNodos= 5;
+               numNodos = 0;
+               String nodos="";
+               // verify if the message is nodes quantity
+               if (receivedMsg.contains("nodes:")) {
+                  nodos = receivedMsg.replaceAll("nodos:","");
+                  numNodos =  Integer.parseInt(nodos);
 
                // verify if the message is the name file
-               if(receivedMsg.contains(".txt")){
+               }else if(receivedMsg.contains(".txt")){
                   filename=receivedMsg.trim();
                   filename = filename.replaceAll("\uFFFF.txt","");
 
@@ -91,8 +97,21 @@ public class ServerUDP {
                   response = "[" + newTimeStamp + "] IP:" + currentClientIP + " : File Receive from server" ;
 
                   Send send= new Send();
-                  send.sendFile(new File("C:\\21-IF5000-RAID5\\Controller_Node_Java\\filesReceive\\MAMAHUEVO.txt"));
-                  send.sendFile(new File("C:\\21-IF5000-RAID5\\Controller_Node_Java\\filesReceive\\PRUEBA.txt"));
+                  RAID5 raid5 = new RAID5();
+
+                  List<String> disks = new ArrayList<>();
+                  for (int i = 0; i < numNodos; i++) {
+                     disks.add("DISK"+i);
+                  }
+
+                  raid5.createDisks(disks,pathFiles);
+                  byte[] fileLikeByte = raid5.parseFileToByte(new File(pathFiles + filename));
+                  raid5.saveFileWithRAID5(fileLikeByte,disks.size(),pathFiles);
+
+                  for (int i = 0; i < numNodos; i++) {
+                     send.sendFile(new File(pathFiles+"DISK"+i+"\\"+"file"+i));
+                     send.sendFile(new File(pathFiles+"DISK"+i+"\\"+"fileParity"+i));
+                  }
 
                   sendMessageToClients( (response).getBytes());
 
