@@ -60,4 +60,24 @@ public class ClientController {
 
         return new ResponseEntity<Map<String, Object>>( response, HttpStatus.CREATED);
     }
+
+    @RequestMapping(value = "/receiveNumNodes")
+    public ResponseEntity<?> receiveNumNodes(/*String numNodes*/) throws IOException {
+
+        Map<String,Object> response = new HashMap<>();
+        try {
+            try {
+                //TODO CAMBIAR PARAMETRO
+                Send send= new Send();
+                send.sendNumNodes("5");
+            } catch (Exception e) {
+                throw new RuntimeException("FAIL!");
+            }
+            response.put("message","Successfully uploaded!");
+            return new ResponseEntity<Map<String,Object>>(response,HttpStatus.OK);
+        } catch (Exception e) {
+            response.put("message",e.getMessage().concat(":").concat(e.getMessage()));
+            return new ResponseEntity<Map<String,Object>>(response,HttpStatus.CONFLICT);
+        }
+    }
 }

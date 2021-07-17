@@ -1,1 +1,1 @@
-are.txt
+nodes:5
