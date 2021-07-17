@@ -6,7 +6,7 @@ import java.util.Random;
 public class Send {
 
     private final int PORT = 16787;
-    private String HOST = "192.168.56.1";
+    private String HOST = "";
     DatagramSocket socket = null;
     String fileNameReceive="";
     String pathFileSave="C:\\21-IF5000-RAID5\\Controller_Node_Java\\files\\";

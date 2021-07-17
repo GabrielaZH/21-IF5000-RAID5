@@ -20,7 +20,8 @@ import java.util.*;
 @RestController
 public class ClientController {
 
-    @Autowired private BookService service;
+    @Autowired
+    private BookService service;
 
     @GetMapping("/books")
     public List<Book> getAll() {
@@ -28,24 +29,26 @@ public class ClientController {
     }
 
     @RequestMapping(value = "/uploadFile")
-    public ResponseEntity<?> uploadFile(/*@RequestParam("file") MultipartFile file*/)  {
-        Map<String,Object> response = new HashMap<>();
+    public ResponseEntity<?> uploadFile(/*@RequestParam("file") MultipartFile file, String numNodes*/) {
+        Map<String, Object> response = new HashMap<>();
         try {
             try {
-                Send send= new Send();
+
+                Send send = new Send();
+
                 //MultipartFile multipartFile = new MockMultipartFile((file.getOriginalFilename()), file.getInputStream());
                 File file = new File("C:\\are.txt");
                 FileInputStream inputStream = new FileInputStream(file);
                 MultipartFile multipartFile = new MockMultipartFile(file.getName(), inputStream);
-                send.sendFile(multipartFile);
+                send.sendFile(multipartFile, "5");
             } catch (Exception e) {
                 throw new RuntimeException("FAIL!");
             }
-            response.put("message","Successfully uploaded!");
-            return new ResponseEntity<Map<String,Object>>(response,HttpStatus.OK);
+            response.put("message", "Successfully uploaded!");
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
         } catch (Exception e) {
-            response.put("message",e.getMessage().concat(":").concat(e.getMessage()));
-            return new ResponseEntity<Map<String,Object>>(response,HttpStatus.CONFLICT);
+            response.put("message", e.getMessage().concat(":").concat(e.getMessage()));
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CONFLICT);
         }
 
     }
@@ -53,31 +56,14 @@ public class ClientController {
     @RequestMapping(value = "/receiveFile")
     public ResponseEntity<?> receiveFile(/*string file*/) throws IOException {
 
-        Map<String,Object> response = new HashMap<>();
-        Send send= new Send();
+        Map<String, Object> response = new HashMap<>();
+        Send send = new Send();
 
-        File fileReceived= send.getFile("are.txt");
+        File fileReceived = send.getFile("are.txt");
 
-        return new ResponseEntity<Map<String, Object>>( response, HttpStatus.CREATED);
+        return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/receiveNumNodes")
-    public ResponseEntity<?> receiveNumNodes(/*String numNodes*/) throws IOException {
-
-        Map<String,Object> response = new HashMap<>();
-        try {
-            try {
-                //TODO CAMBIAR PARAMETRO
-                Send send= new Send();
-                send.sendNumNodes("5");
-            } catch (Exception e) {
-                throw new RuntimeException("FAIL!");
-            }
-            response.put("message","Successfully uploaded!");
-            return new ResponseEntity<Map<String,Object>>(response,HttpStatus.OK);
-        } catch (Exception e) {
-            response.put("message",e.getMessage().concat(":").concat(e.getMessage()));
-            return new ResponseEntity<Map<String,Object>>(response,HttpStatus.CONFLICT);
-        }
-    }
 }
+
+
