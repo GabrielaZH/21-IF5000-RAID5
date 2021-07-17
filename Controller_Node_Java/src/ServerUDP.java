@@ -79,18 +79,18 @@ public class ServerUDP {
                receivedMsg = readFile(decodeFile(pathFiles + "fileEncode.txt", pathFiles + "fileDecode.txt"));//read data in file
 
                //TODO Recibir archivo con numero de nodos
-               numNodos = 0;
                String nodos="";
                // verify if the message is nodes quantity
                if (receivedMsg.contains("nodes:")) {
-                  nodos = receivedMsg.replaceAll("nodos:","");
+                  nodos = receivedMsg.replaceAll("nodes:","");
+                  nodos = nodos.replaceAll("\uFFFF","");
                   numNodos =  Integer.parseInt(nodos);
 
                // verify if the message is the name file
                }else if(receivedMsg.contains(".txt")){
                   filename=receivedMsg.trim();
-                  filename = filename.replaceAll("\uFFFF.txt","");
-
+                  filename = filename.replaceAll(".txt","");
+                  filename = filename.replaceAll("\uFFFF","");
                   //verify if the message is the content file for save
                } else if(!receivedMsg.contains("receiveRequest")){
                   decodeFile(pathFiles+"fileEncode.txt",pathFiles+filename+".txt");
@@ -105,12 +105,12 @@ public class ServerUDP {
                   }
 
                   raid5.createDisks(disks,pathFiles);
-                  byte[] fileLikeByte = raid5.parseFileToByte(new File(pathFiles + filename));
+                  byte[] fileLikeByte = raid5.parseFileToByte(new File(pathFiles+filename+".txt"));
                   raid5.saveFileWithRAID5(fileLikeByte,disks.size(),pathFiles);
 
                   for (int i = 0; i < numNodos; i++) {
-                     send.sendFile(new File(pathFiles+"DISK"+i+"\\"+"file"+i));
-                     send.sendFile(new File(pathFiles+"DISK"+i+"\\"+"fileParity"+i));
+                     send.sendFile(new File(pathFiles+"DISK"+i,"file"+i+".txt"));
+                     send.sendFile(new File(pathFiles+"DISK"+i,"fileParity"+i+".txt"));
                   }
 
                   sendMessageToClients( (response).getBytes());

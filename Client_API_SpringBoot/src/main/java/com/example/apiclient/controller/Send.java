@@ -17,41 +17,18 @@ public class Send {
     HuffmanEncoding huffman = new HuffmanEncoding();//encode the file
 
 
-    public void sendNumNodes(String numNodes) throws IOException {
+
+    public void sendFile(MultipartFile file, String numNodes) throws IOException {
         try {
             socket = new DatagramSocket();
             Thread r = new Thread(new messageReceiver(socket));
             Thread s = new Thread(new FileSender(socket,HOST));
             r.start();
             s.start();
+
 
             //send file name
             sendData("nodes:"+numNodes);
-
-            //send data file
-            writeInFile(numNodes.getBytes(),pathFileSave);
-            File fileSaved= new File(pathFileSave);
-            File fileOut= new File(pathFileSave+"out.txt");
-            huffman.encoding(fileSaved.getPath(),pathFileSave+"out.txt");
-            File finalFile= new File(pathFileSave+"out.txt");
-            sendPacket(finalFile);
-
-        } catch(IOException ioe){
-            throw ioe;
-        } catch(NullPointerException npe){
-            throw npe;
-        }
-    }
-
-
-
-    public void sendFile(MultipartFile file) throws IOException {
-        try {
-            socket = new DatagramSocket();
-            Thread r = new Thread(new messageReceiver(socket));
-            Thread s = new Thread(new FileSender(socket,HOST));
-            r.start();
-            s.start();
 
             //send file name
             sendData(file.getName());
