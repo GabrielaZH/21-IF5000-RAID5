@@ -5,27 +5,31 @@ saSEARCH is a client application that connects to Controller Node to find the bo
 *** 
 ### Application functionalities:
 
-**Angular cli (FrontEnd_Angular_Client):** 
+**Angular cli (FrontEnd_Angular):** 
 
-- Allows to verify customer data
-- Register new client
-- Save images
-- To list images
+- allows to list the books (plain text files)
+- allows to request the file
+- allows uploading files
 
-**Springboot Api (BackEnd_Java_Client):**
+**Springboot Api (Client_API_SpringBoot):**
 
-- Allows save clients in the SQL data base
-- Communicates with the server to send and receive images
+- Allows save allows to save the metadata of the books in the SQL data base
+- Communicates with the nodeController to send and receive files
 
 
-**Java application (BackEnd_Java_Server):**
+**Java application (Controller_Node_Java):**
 
-- It receives the client's requests which are to send and receive images.
+- It receives the client's requests which are to send and receive files.
+- Controls the access and storage of books in the nodes
+
+**Java application (Processos_Disk_Nodes_Java):**
+
+- It receives requests which are to send and receive files from nodeController.
 
 
 **SQL (DataBase):**
 
-- Stores customer data.
+- Stores books data.
 
 
 *** 
