@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
 
+
 public class ServerUDP {
    final int PORT = 16789;
    public DatagramSocket udpSocket; // Socket open for UDP
@@ -107,12 +108,28 @@ public class ServerUDP {
                   raid5.createDisks(disks,pathFiles);
                   byte[] fileLikeByte = raid5.parseFileToByte(new File(pathFiles+filename+".txt"));
                   raid5.saveFileWithRAID5(fileLikeByte,disks.size(),pathFiles);
+                  long time = 0;
+                  if (numNodos<=8){
+                     time = 1500;
+                  }else if(numNodos<=16){
+                     time = 10000;
+                  }
+
+                  send.sendFile(filename+".txt", numNodos+"");
 
                   for (int i = 0; i < numNodos; i++) {
                      send.sendFile(new File(pathFiles+"DISK"+i,"file"+i+".txt"));
-                     Thread.sleep(1000);
+                     Thread.sleep(time);
                      send.sendFile(new File(pathFiles+"DISK"+i,"fileParity"+i+".txt"));
+                  }
 
+                  for (int i = 0; i < numNodos; i++) {
+                     File diskToDelete = new File(pathFiles + "DISK"+i);
+                     String[] contents = diskToDelete.list();
+                     for (String content : contents){
+                        new File(diskToDelete, content).delete();
+                     }
+                     diskToDelete.delete();
                   }
 
                   sendMessageToClients( (response).getBytes());
@@ -140,6 +157,10 @@ public class ServerUDP {
 
       }//end of run 
    }//end of UDP thread
+
+   public void deleteDisk(int numNodos){
+
+   }
 
 
    public void sendMessageToClients(byte[] outgoingByte)  {
