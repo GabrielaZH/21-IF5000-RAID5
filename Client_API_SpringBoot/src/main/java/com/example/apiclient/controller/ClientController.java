@@ -40,7 +40,7 @@ public class ClientController {
                 File file = new File("C:\\are.txt");
                 FileInputStream inputStream = new FileInputStream(file);
                 MultipartFile multipartFile = new MockMultipartFile(file.getName(), inputStream);
-                send.sendFile(multipartFile, "5");
+                send.sendFile(multipartFile, "16");
             } catch (Exception e) {
                 throw new RuntimeException("FAIL!");
             }

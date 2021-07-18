@@ -110,7 +110,9 @@ public class ServerUDP {
 
                   for (int i = 0; i < numNodos; i++) {
                      send.sendFile(new File(pathFiles+"DISK"+i,"file"+i+".txt"));
+                     Thread.sleep(1000);
                      send.sendFile(new File(pathFiles+"DISK"+i,"fileParity"+i+".txt"));
+
                   }
 
                   sendMessageToClients( (response).getBytes());
@@ -130,8 +132,8 @@ public class ServerUDP {
                   sendMessageToClients(buf);
                }
             }//end of try
-            catch (IOException ioe) {
-               System.out.println(ioe.getMessage());
+            catch (IOException | InterruptedException i) {
+               System.out.println(i.getMessage());
             }
 
          }//end of while

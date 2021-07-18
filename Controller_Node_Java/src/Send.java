@@ -2,6 +2,7 @@ import huffman.HuffmanEncoding;
 import java.io.*;
 import java.net.*;
 import java.util.Random;
+import java.util.Vector;
 
 public class Send {
 
@@ -19,20 +20,23 @@ public class Send {
     public void sendFile(File file) throws IOException {
         try {
             socket = new DatagramSocket();
-            Thread r = new Thread(new messageReceiver(socket));
+          /*  Thread r = new Thread(new messageReceiver(socket));
             Thread s = new Thread(new FileSender(socket,HOST));
             r.start();
-            s.start();
+            s.start();*/
 
-            //send file name
-            sendData(file.getName());
 
-            //send data file
-            //File fileSaved= new File(pathFileSave+file.getName());
-            File fileOut= new File(pathFileSave+"out.txt");
-            huffman.encoding(file.getPath(),pathFileSave+"out.txt");
-            File finalFile= new File(pathFileSave+"out.txt");
-            sendPacket(finalFile);
+                //send file name
+                sendData(file.getName());
+
+                //send data file
+                //File fileSaved= new File(pathFileSave+file.getName());
+                File fileOut= new File(pathFileSave+"out.txt");
+                huffman.encoding(file.getPath(),pathFileSave+"out.txt");
+                File finalFile= new File(pathFileSave+"out.txt");
+                sendPacket(finalFile);
+
+
 
             } catch(IOException ioe){
                 throw ioe;
@@ -89,7 +93,7 @@ public class Send {
             while (true) {
                 try {
                     while (!in.ready()) {
-                        Thread.sleep(100);
+                        Thread.sleep(90000000);
                     }
 
                 }
