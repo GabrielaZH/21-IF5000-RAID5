@@ -87,9 +87,12 @@ public class ServerUDP {
 
                   //verify if the message is the content file for save
                } else if(!receivedMsg.contains("receiveRequest")){
-                  decodeFile(pathFiles+"fileEncode.txt",pathFiles+filename+".txt");
-                  response = "[" + newTimeStamp + "] IP:" + currentClientIP + " : File Receive from server" ;
-                  sendMessageToClients( (response).getBytes());
+
+                     decodeFile(pathFiles + "fileEncode.txt", pathFiles + filename + ".txt");
+
+                  //response = "[" + newTimeStamp + "] IP:" + currentClientIP + " : File Receive from server" ;
+                 // Thread.sleep(30000000);
+                //  sendMessageToClients( (response).getBytes());
 
                   //verify if the message is send the file
                }else if (receivedMsg.contains("receiveRequest")){
@@ -106,8 +109,8 @@ public class ServerUDP {
                   sendMessageToClients(buf);
                }
             }//end of try
-            catch (IOException ioe) {
-               System.out.println(ioe.getMessage());
+            catch (IOException i ) {
+               System.out.println(i.getMessage());
             }
 
          }//end of while
