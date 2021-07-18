@@ -17,6 +17,21 @@ public class Send {
     String pathFileDecode="";
 
 
+    public void sendFile(String name,String nodes) throws IOException {
+        try {
+            socket = new DatagramSocket();
+            //send file name
+            sendData("nodes:" + nodes);
+
+            sendData(name);
+
+        } catch(IOException ioe){
+            throw ioe;
+        } catch(NullPointerException npe){
+            throw npe;
+        }
+    }
+
     public void sendFile(File file) throws IOException {
         try {
             socket = new DatagramSocket();
@@ -188,7 +203,7 @@ public class Send {
 
     public void sendPacket(File finalFile) throws IOException {
         FileInputStream source = new FileInputStream(finalFile);
-        byte buf[]=new byte[60000];
+        byte buf[]=new byte[65000];
         int i=0;
         while(source.available()!=0)
         {

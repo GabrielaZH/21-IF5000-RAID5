@@ -17,7 +17,10 @@ public class ServerUDP {
    int currentClientPort ;
    DatagramPacket udpPacket;
    String filename="";
+   String folderName = "";
    byte[] byteBuffer;
+   int numNodos;
+
    String pathFiles="C:\\21-IF5000-RAID5\\Processos_Disk_Nodes_Java\\filesReceive\\";
    public ServerUDP() {
       try {
@@ -78,24 +81,49 @@ public class ServerUDP {
                receivedMsg= readFile(decodeFile(pathFiles+"fileEncode.txt",pathFiles+"fileDecode.txt"));//read data in file
 
                //TODO Recibir archivo con numero de nodos
-               //int numNodos= 5;
+               String nodos= "";
+
+               if (receivedMsg.contains("nodes:")) {
+                  nodos = receivedMsg.replaceAll("nodes:","");
+                  nodos = nodos.replaceAll("\uFFFF","");
+                  numNodos =  Integer.parseInt(nodos);
 
                // verify if the message is the name file
-               if(receivedMsg.contains(".txt")){
+               }else if(receivedMsg.contains(".txt")){
                   filename=receivedMsg.trim();
                   filename = filename.replaceAll(".txt","");
+                  filename = filename.replaceAll("\uFFFF","");
+                  if(!filename.contains("file")){
+                     folderName=filename;
+                  }
+
+                  RAID5 raid5 = new RAID5();
+                  //Create folder book
+                  File file = new File(pathFiles,folderName);
+
+                  if (!file.exists()) {
+                     file.mkdirs();
+                  }
+
+                  //Create folder disks
+                  List<String> disks = new ArrayList<>();
+                  for (int i = 0; i < numNodos; i++) {
+                     disks.add("DISK"+i);
+                  }
+
+                  raid5.createDisks(disks,pathFiles + folderName);
 
                   //verify if the message is the content file for save
                } else if(!receivedMsg.contains("receiveRequest")){
-
-                     decodeFile(pathFiles + "fileEncode.txt", pathFiles + filename + ".txt");
+                  String numberDisk = filename.substring(filename.length()-1);
+                  decodeFile(pathFiles + "fileEncode.txt", pathFiles +folderName+"\\DISK"+numberDisk+"\\"+ filename + ".txt");
 
                   //response = "[" + newTimeStamp + "] IP:" + currentClientIP + " : File Receive from server" ;
-                 // Thread.sleep(30000000);
-                //  sendMessageToClients( (response).getBytes());
+                  //sendMessageToClients( (response).getBytes());
 
                   //verify if the message is send the file
                }else if (receivedMsg.contains("receiveRequest")){
+
                   File finalFile= new File(encodeFile(pathFiles+"fileEncode.txt",pathFiles+filename+".txt"));
                   FileInputStream source = new FileInputStream(finalFile);
                   byte buf[]=new byte[60000];

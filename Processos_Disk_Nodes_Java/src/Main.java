@@ -138,7 +138,6 @@ public class Main {
 
     //Apaga um disco para teste de recuperação da paridade
     private static void deleteDisk(String disk){
-
         File diskToDelete = new File(PATH + disk);
 
         String[] contents = diskToDelete.list();
