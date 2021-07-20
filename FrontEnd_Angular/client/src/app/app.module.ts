@@ -7,7 +7,8 @@ import { FooterComponent } from './footer/footer.component';
 import { HeaderComponent } from './header/header.component';
 import {HttpClientModule}from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import {DataTablesModule} from 'angular-datatables';
+import { DataTablesModule } from "angular-datatables";
+
 
 @NgModule({
   declarations: [
@@ -21,7 +22,7 @@ import {DataTablesModule} from 'angular-datatables';
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    DataTablesModule,
+    DataTablesModule
   ],
   providers: [],
   bootstrap: [AppComponent]
