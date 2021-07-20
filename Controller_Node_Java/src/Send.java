@@ -35,23 +35,15 @@ public class Send {
     public void sendFile(File file) throws IOException {
         try {
             socket = new DatagramSocket();
-          /*  Thread r = new Thread(new messageReceiver(socket));
-            Thread s = new Thread(new FileSender(socket,HOST));
-            r.start();
-            s.start();*/
 
+            //send file name
+            sendData(file.getName());
 
-                //send file name
-                sendData(file.getName());
-
-                //send data file
-                //File fileSaved= new File(pathFileSave+file.getName());
-                File fileOut= new File(pathFileSave+"out.txt");
-                huffman.encoding(file.getPath(),pathFileSave+"out.txt");
-                File finalFile= new File(pathFileSave+"out.txt");
-                sendPacket(finalFile);
-
-
+            //send data file
+            File fileOut= new File(pathFileSave+"out.txt");
+            huffman.encoding(file.getPath(),pathFileSave+"out.txt");
+            File finalFile= new File(pathFileSave+"out.txt");
+            sendPacket(finalFile);
 
             } catch(IOException ioe){
                 throw ioe;
@@ -62,15 +54,16 @@ public class Send {
 
 
 
-    public void getFile(String fileName) throws IOException {
+    public void getFile(String fileName, int numReject, String numNodes) throws IOException {
         fileNameReceive=fileName;
         try {
             socket = new DatagramSocket();
-            Thread r = new Thread(new FileReceiver(socket));
+            Thread r = new Thread(new FileReceiver(socket, numReject));
             Thread s = new Thread(new FileSender(socket,HOST));
             r.start();
             s.start();
 
+            sendData("nodes:"+numNodes);
             //send file name
             sendData(fileName);
             //send type request
@@ -146,10 +139,14 @@ public class Send {
     class FileReceiver implements Runnable {
         DatagramSocket sock;
         byte buf[];
+        int i;
+        int numRejected;
+        boolean flag;
 
-        FileReceiver(DatagramSocket s) {
+        FileReceiver(DatagramSocket s, int numReject) {
             sock = s;
             buf = new byte[60000];
+            numRejected = numReject;
         }
 
         public void run() {
@@ -166,12 +163,23 @@ public class Send {
                     } catch (Exception e) {
                         throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
                     }
-                    Random random = new Random();
-                    Integer numberRandom = random.nextInt(20);
 
-                    pathFileDecode = pathFileReceive +numberRandom;
-                    HuffmanEncoding huffman = new HuffmanEncoding();
-                    huffman.decode(pathFileEncode, pathFileDecode);
+                    if(i==numRejected){
+                        i++;
+                    }
+
+                    if(!flag){
+                        pathFileDecode = pathFileReceive +"file" +i+".txt";
+                        HuffmanEncoding huffman = new HuffmanEncoding();
+                        huffman.decode(pathFileEncode, pathFileDecode);
+                    }else{
+                        pathFileDecode = pathFileReceive + "fileParity" +i+".txt";
+                        HuffmanEncoding huffman = new HuffmanEncoding();
+                        huffman.decode(pathFileEncode, pathFileDecode);
+                        i++;
+                    }
+                    flag=!flag;
+
                 }
                 catch(Exception e) {
                     System.err.println(e);
@@ -179,18 +187,6 @@ public class Send {
             }
         }//end of run
     }//end of ClassFileReceiver
-
-//    public void saveFile(MultipartFile file, String path)  {
-//        File fileToSave = new File(path+file.getName());
-//        try (OutputStream os = new FileOutputStream(fileToSave)) {
-//            InputStream initialStream = file.getInputStream();
-//            byte[] buffer = new byte[initialStream.available()];
-//            initialStream.read(buffer);
-//            os.write(buffer);
-//        } catch (Exception e) {
-//            throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
-//        }
-//    }
 
     public void sendData(String fileName) throws IOException {
         writeInFile(fileName.getBytes(),pathFileSave+"tempNameFile.txt");

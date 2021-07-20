@@ -1,9 +1,7 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class RAID5 {
-    private static PrintWriter w;
 
 
     /*Crea carpetas temporales de discos donde iran el archivo con el trozo del  libro y su paridad*/
@@ -75,6 +73,154 @@ public class RAID5 {
         }
     }
 
+    //Recupera o disco com o disco de paridade REFATORADO
+    public int findDiskCorrupted(List<String> disks,String path, String lastDisk){
+        int countDiskCorrupted = countDiskCorrupted(disks,path);
+        List<Integer> filesForBackUp = new ArrayList<>();
+
+        if (countDiskCorrupted==1){
+            for (int i = 0; i < disks.size(); i++) {
+                if (!new File(path+disks.get(i)).exists()) {
+                    for (int j = 0; j < disks.size(); j++) {
+                        if(j!=i){
+                            filesForBackUp.add(j);
+                        }
+                    }
+                    recoveryDisk(disks.get(i), filesForBackUp, path, lastDisk);
+                    break;
+                }
+            }
+        }else if(countDiskCorrupted>=2){
+            System.out.println("Imposible recuperar el archivo, hay mas de un disco dañado!");
+        }else{
+            System.out.println("Ningun disco está dañado!");
+        }
+        return countDiskCorrupted;
+    }
+
+    public void remakeFile(List<String> disks, String path, String fileRestored) {
+        boolean flag= true;
+        int countFile=disks.size()-1;
+        List<Byte> fullFile = new ArrayList();
+        byte[] fullFileArray;
+
+        List<String[]> contents = new ArrayList<>();
+        for (int i = 0; i < disks.size(); i++) {
+            contents.add(new File(path + disks.get(i)).list());
+        }
+
+        try {
+            List<Scanner> scanners = new ArrayList<>();
+            for (int i = 0; i < disks.size(); i++) {
+                scanners.add(new Scanner(new File(path + disks.get(i), contents.get(i)[0])));
+            }
+
+            while (flag){
+                fullFile.add(Byte.parseByte(scanners.get(countFile).next()));
+                countFile--;
+                if (countFile == -1) {
+                    countFile = disks.size() - 1;
+                }
+                for (int i = 0; i < scanners.size(); i++) {
+                    flag = scanners.get(i).hasNext()? true: false;
+                    if(flag){
+                        break;
+                    }
+                }
+            }
+            fullFileArray = new byte[fullFile.size()];
+            for (int i = 0; i < fullFile.size(); i++){
+                fullFileArray[i] = fullFile.get(i);
+            }
+            String s = new String(fullFileArray);
+
+            File remakeFile = new File(path, fileRestored);
+            PrintWriter w = new PrintWriter(remakeFile);
+            w.print(s);
+            w.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void recoveryDisk(String diskLose, List<Integer> numberFileBackUp, String path, String lastDisk){
+        try {
+            //Recrear el disco
+            createDisks(Arrays.asList(diskLose),path);
+            int numberDiskLose = Integer.parseInt(diskLose.substring(4));
+            //Recrea el archivo dañado
+            File recoveredFile = new File(path + diskLose, "file"+numberDiskLose+".txt");
+
+
+            List<Scanner> scanners = new ArrayList<>();
+            for (int i = 0; i < numberFileBackUp.size(); i++) {
+                scanners.add(new Scanner(new FileReader(new File(path + "DISK"+numberFileBackUp.get(i), "file"+numberFileBackUp.get(i)+".txt"))).useDelimiter("\\n"));
+            }
+
+            //Get a ramdon disk number for recover parity
+            Random random = new Random();
+            Integer numberRandom = numberFileBackUp.get(random.nextInt(numberFileBackUp.size()));
+
+            //Cria um leitor do arquivo de paridade para criar a paridade
+            Scanner readFileParity = new Scanner(new FileReader(new File(path + "DISK"+numberRandom, "fileParity"+numberRandom+".txt"))).useDelimiter("\\n");
+
+            List<Byte> bytesArrayFile = new ArrayList();
+            while (readFileParity.hasNext()) {
+                List<Byte> bytesForRecover = new ArrayList();
+
+                for (int i = numberFileBackUp.size()-1; i > -1 ; i--) {
+                    if(!diskLose.equals(lastDisk)){
+                        bytesForRecover.add((scanners.get(i).hasNext()) ? Byte.parseByte(scanners.get(i).next().replace("\r", "")) : 0);
+                    }else{
+                        bytesForRecover.add((scanners.get(i).hasNext()) ? (byte) (0 - Byte.parseByte(scanners.get(i).next().replace("\r", ""))) : 0);
+                    }
+                }
+
+                bytesForRecover.add(Byte.parseByte(readFileParity.next().replace("\r", "")));
+                bytesArrayFile.add(recoveredByte(bytesForRecover, diskLose, lastDisk));
+            }
+
+            fillBytesFile(bytesArrayFile, recoveredFile);
+            System.out.println("\nRecuperando arquivo!");
+            System.out.println("Arquivo recuperado com sucesso!");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static Byte recoveredByte(List<Byte> bytesForRecover, String diskLose, String lastDisk) {
+        byte result=0;
+
+        int finalIndex = bytesForRecover.size()-1;
+
+        if(diskLose.equals(lastDisk)){
+            for (int i = 0; i < bytesForRecover.size()-1; i++) {
+                result = (byte) (result - bytesForRecover.get(i));
+            }
+            result = (byte) (result + bytesForRecover.get(finalIndex));
+        }else{
+            for (int i = 0; i < bytesForRecover.size()-1; i++) {
+                if (i == 0){
+                    result = (byte) (result + bytesForRecover.get(i));
+                }else{
+                    result = (byte) (result - bytesForRecover.get(i));
+                }
+            }
+            byte byteRecover = (byte) (0 - bytesForRecover.get(finalIndex));
+            result = (byte) (result + byteRecover);
+        }
+        return result;
+    }
+
+    public int countDiskCorrupted(List<String> disks, String path) {
+        int countCorrupted = 0;
+        for (int i = 0; i < disks.size(); i++) {
+            if (!new File(path+disks.get(i)).exists())
+                countCorrupted++;
+        }
+        return countCorrupted;
+    }
+
     public void completeDisks(List<List<Byte>> superlist, int major) {
         int substraction;
 
@@ -100,11 +246,12 @@ public class RAID5 {
 
     public void fillBytesFile(List<Byte> bytesArray, File file){
         try {
+            PrintWriter w;
             w = new PrintWriter(file);
             for (byte value : bytesArray) w.println(value);
             w.close();
         } catch (FileNotFoundException e) {
-            System.out.println("Não foi possível criar o arquivo solicitado!");
+            System.out.println("No es posible crear el archivo deseado!");
         }
     }
 }

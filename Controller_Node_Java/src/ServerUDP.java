@@ -3,6 +3,10 @@ import huffman.HuffmanEncoding;
 
 import java.net.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.text.SimpleDateFormat;
 
@@ -76,7 +80,6 @@ public class ServerUDP {
                String response = "";
                String receivedMsg = "";
 
-
                receivedMsg = readFile(decodeFile(pathFiles + "fileEncode.txt", pathFiles + "fileDecode.txt"));//read data in file
 
                //TODO Recibir archivo con numero de nodos
@@ -106,6 +109,7 @@ public class ServerUDP {
                   }
 
                   raid5.createDisks(disks,pathFiles);
+
                   byte[] fileLikeByte = raid5.parseFileToByte(new File(pathFiles+filename+".txt"));
                   raid5.saveFileWithRAID5(fileLikeByte,disks.size(),pathFiles);
                   long time = 0;
@@ -114,7 +118,6 @@ public class ServerUDP {
                   }else if(numNodos<=16){
                      time = 10000;
                   }
-
                   send.sendFile(filename+".txt", numNodos+"");
 
                   for (int i = 0; i < numNodos; i++) {
@@ -123,19 +126,89 @@ public class ServerUDP {
                      send.sendFile(new File(pathFiles+"DISK"+i,"fileParity"+i+".txt"));
                   }
 
+                  sendMessageToClients( (response).getBytes());
+
+                  System.gc();
                   for (int i = 0; i < numNodos; i++) {
                      File diskToDelete = new File(pathFiles + "DISK"+i);
                      String[] contents = diskToDelete.list();
                      for (String content : contents){
-                        new File(diskToDelete, content).delete();
+                        Files.delete(Paths.get(pathFiles+"DISK"+i+"\\"+content));
                      }
-                     diskToDelete.delete();
                   }
+                  Files.delete(Paths.get(pathFiles+filename+".txt"));
 
-                  sendMessageToClients( (response).getBytes());
 
                   //verify if the message is send the file
                }else if (receivedMsg.contains("receiveRequest")){
+                  Send send = new Send();
+                  long time = 0;
+                  if (numNodos<=8){
+                     time = 1500*2;
+                  }else if(numNodos<=16){
+                     time = 10000*2;
+                  }
+
+                  //Get files from nodes with encription
+                  int numRejected=-1;
+                  int x=0;
+
+                  File diskToDel = new File("C:\\21-IF5000-RAID5\\Processos_Disk_Nodes_Java\\filesReceive\\" +filename);
+                  String[] contente = diskToDel.list();
+
+                  if(contente.length!=numNodos){
+                     numRejected=numNodos-1;
+                  }
+
+                  for (String conte : contente){
+                     int numberDisk = Integer.parseInt(conte.replaceAll("DISK",""));
+                     if(numberDisk != x){
+                        numRejected=x;
+                        break;
+                     }
+                     x++;
+                  }
+
+                  send.getFile("are.txt",numRejected, numNodos+"");
+                  Thread.sleep(time);
+
+                  List<String> disks = new ArrayList<>();
+                  for (int i = 0; i < numNodos; i++) {
+                     disks.add("DISK"+i);
+                  }
+
+                  RAID5 raid5 = new RAID5();
+                  raid5.createDisks(disks, pathFiles);
+
+                  File diskToDelete = new File(pathFiles);
+                  String[] contents = diskToDelete.list();
+                  int j = 0, sizeName=0;
+                  for (String content : contents){
+                     if(!content.contains("DISK") && !content.contains("gitkeep") && !content.contains("fileDecode") && !content.contains("fileEncode") && !content.contains("encode")){
+                        sizeName= content.length();
+                        j = Integer.parseInt(content.substring(sizeName-5,sizeName-4));
+
+                        Path sourcepath = Paths.get(pathFiles+content);
+                        Path destinationepath = Paths.get(pathFiles+"DISK"+j+"\\"+content);
+                        Files.copy(sourcepath, destinationepath, StandardCopyOption.REPLACE_EXISTING);
+                        new File(pathFiles+content).delete();
+                     }
+                  }
+
+                  for (int i = 0; i < numNodos; i++) {
+                     diskToDel = new File(pathFiles + "DISK"+i);
+                     String[] content = diskToDel.list();
+                     if(content.length==0){
+                        Files.delete(Paths.get(pathFiles + "DISK"+i));
+                     }
+                  }
+
+                  String lastDisk = disks.get(disks.size()-1);
+
+                  raid5.findDiskCorrupted(disks,pathFiles,lastDisk);
+                  raid5.remakeFile(disks, pathFiles, filename+".txt");
+
+
                   File finalFile= new File(encodeFile(pathFiles+"fileEncode.txt",pathFiles+filename+".txt"));
                   FileInputStream source = new FileInputStream(finalFile);
                   byte buf[]=new byte[60000];
@@ -157,10 +230,6 @@ public class ServerUDP {
 
       }//end of run 
    }//end of UDP thread
-
-   public void deleteDisk(int numNodos){
-
-   }
 
 
    public void sendMessageToClients(byte[] outgoingByte)  {
