@@ -21,6 +21,7 @@ export class ClientService {
 
   public book:Book = new Book();
 
+  
 
 
  private extractData(res: Response) {
@@ -47,8 +48,15 @@ upload(file: File){
 
 getBooks(): Observable<any>{
   const url = `${base_url}/client/books`;
-  return this.http.get(url);
+  return this.http.get(url)
 }
+
+
+
+
+
+
+
 
 
 private handleError<T> (operation = 'operation', result?: T) {

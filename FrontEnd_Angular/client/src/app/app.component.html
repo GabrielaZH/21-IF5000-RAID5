@@ -1,48 +1,43 @@
 <app-header></app-header>
 
-<div class ="container">
+<div class="container">
 
-<router-outlet></router-outlet>
+    <router-outlet></router-outlet>
 
-     <form>
+    <form>
         <div class="formulario__grupo col-md-12">
             <label class="form-label">File (.txt)</label>
-            <input id="imagenFile" (change)="selectFile($event)" onChange="document.getElementById().src = window.URL.createObjectURL(this.files[0])" type="file" title="TXT" class="form-control mt-0" name="image" accept="file/.txt">
+            <input id="imagenFile" (change)="selectFile($event)"
+                onChange="document.getElementById().src = window.URL.createObjectURL(this.files[0])" type="file"
+                title="TXT" class="form-control mt-0" name="image" accept="file/.txt">
         </div>
-        <br/>
+        <br />
         <div class="col-md-6">
-            <button type="button" (click)="upload()"  class="btn btn-primary">Upload</button>
+            <button type="button" (click)="upload()" class="btn btn-primary">Upload</button>
         </div>
         <br>
     </form>
-    <div class="card">
-        <div class="table-responsive">
-        <table class=' table'>
-            <thead >
+    <table datatable class="row-border hover">
+        <thead>
             <tr>
-            <th>Número</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Acción</th>
+                <th>Número</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Acción</th>
             </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let book of bookList | async">
-                    <td>{{ book.id }}</td>
-                    <td>{{ book.name}}</td>
-                    <td>{{ book.description }}</td>
-                    <td>
-                      <button class="btn-primary btn"><i class="fas fa-eye"></i></button>
-                    </td>
-                  </tr>
-            </tbody>
-        </table>
-        </div>
-
-    </div>
+        </thead>
+        <tbody>
+            <tr *ngFor="let book of bookList | async">
+                <td>{{ book.id }}</td>
+                <td>{{ book.name}}</td>
+                <td>{{ book.description }}</td>
+                <td>
+                    <button class="btn-primary btn"><i class="fas fa-eye"></i></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
 </div>
 
 <app-footer></app-footer>
-
-
