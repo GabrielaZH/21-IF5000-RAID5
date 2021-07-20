@@ -6,10 +6,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /***************************************************************************************
- *  
+ *
  *  Utilidad: Permite la escritura de bytes hacia un archivo 
  *  		  de salida, cuyo path se proporciona.
- *  
+ *  @author JaimePerezS/Codificacion-Huffman
+ *
  **************************************************************************************/
 
 public class EscritorBinario {
@@ -41,7 +42,7 @@ public class EscritorBinario {
      * Añade un bit al buffer.
      * 
      * @param bit Representa el bit que va a ser añadido, empleando un booleano: 0=false o 1=true
-     * @throws IOException
+     *
      */
     public void escribirBit(boolean bit) {
     	
@@ -53,13 +54,11 @@ public class EscritorBinario {
         if (numBitsOcupados == 8) 
         	vaciarBuffer();
     }
-    
-    
+
+
     /**
-     * Escribir palabra de 8 bits en el archivo de salida 
-     * 
-     * @param palabra
-     * @throws IOException
+     * Escribir palabra de 8 bits en el archivo de salida
+     * @param palabra palabra a escribir
      */
     public void escribirPalabra(int palabra) {
     	
