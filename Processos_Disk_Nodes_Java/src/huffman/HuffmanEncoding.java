@@ -12,10 +12,10 @@ import java.util.PriorityQueue;
  *  Ejecución: 
  *  	% Comprimir:    java entrada_salida.PlantillaCodificacionHuffman -c filePathIn filePathOut
  *      % Decomprimir:  java entrada_salida.PlantillaCodificacionHuffman -d filePathIn filePathOut
- *  
+ *
  *  Utilidad: Permite la compresión/descompresión usando el algoritmo de Huffman
  *  de un archivo de entrada hacia un archivo de salida. 
- *  
+ *  @author JaimePerezS/Codificacion-Huffman
  *
  *********************************************************************************************/
 
@@ -26,12 +26,18 @@ public class HuffmanEncoding {
 	public HuffmanEncoding(){
 		
 	}
-	
-	/*
-	* Se lee el archivo de entrada (filePathIn, a comprimir) como secuencia de palabras de 8 bits 
-	* usando LectorBinario, después se codifica con el algoritmo de Huffman y el resultado 
-	* se escribe usando la clase EscritorBinario hacia el archivo de salida (filePathOut, comprimido).
-	*/
+
+	/**
+
+	 */
+
+	/**
+	 * Se lee el archivo de entrada (filePathIn, a comprimir) como secuencia de palabras de 8 bits
+	 * usando LectorBinario, después se codifica con el algoritmo de Huffman y el resultado
+	 * se escribe usando la clase EscritorBinario hacia el archivo de salida (filePathOut, comprimido).
+	 * @param filePathIn ruta de entrada del archivo
+	 * @param filePathOut ruta de salida del archivo
+	 */
     public void encoding(String filePathIn, String filePathOut) {
 		
     	LectorBinario lector = new LectorBinario(filePathIn);
@@ -79,11 +85,12 @@ public class HuffmanEncoding {
 		// Codificar la trama (char[]input) usando el diccionario de códigos.
         codificar(input,diccionarioCodigos,filePathOut,arbol);
 	}
-
-   /* 
-    * Construir arbol de Huffman a partir de la tabla de frecuencias.
-    * (Si se ha usado una estructura Map para albergar la tabla de frecuencias).
-    */
+	/**
+	 * Construir arbol de Huffman a partir de la tabla de frecuencias.
+	 * (Si se ha usado una estructura Map para albergar la tabla de frecuencias).
+	 * @param freq de aparicion
+	 * @return ArbolHuffman
+	 */
  	public ArbolHuffman construirArbol(Map<Character,Integer> freq) {
  		char clave;
  		int valor;
@@ -128,11 +135,14 @@ public class HuffmanEncoding {
  		// construido en la TAREA1.4
      	return nuevoArbol; 
  	}
-    
-   /* 
-    * Construir diccionario de búsqueda -> Pares (símbolo,código).
-    * (Si se usa una estructura Map para albergar el diccionario de códigos).
-    */
+
+	/**
+	 * Construir diccionario de busqueda pares (simbolo,codigo).
+	 * (Si se usa una estructura Map para albergar el diccionario de códigos).
+	 * @param diccionarioCodigos diccionarioCodigos
+	 * @param arbol arbol
+	 * @param codigoCamino codigoCamino
+	 */
     public void construirCodigos(Map<Character,String>  diccionarioCodigos, ArbolHuffman arbol,String codigoCamino){
     	
     	///////////////////////TAREA1.5///////////////////////
@@ -150,12 +160,16 @@ public class HuffmanEncoding {
     	}
         //////////////////////////////////////////////////////
     }
-    
-   /* 
-    * Codificar la trama (char[]input) usando el diccionario de códigos y escribirla en el
-    * archivo de salida cuyo path (String filePathOut) se facilita como argumento.
-    * (Si se usa una estructura Map para albergar el diccionario de códigos).
-    */
+
+	/**
+	 * Codificar la trama (char[]input) usando el diccionario de códigos y escribirla en el
+	 * archivo de salida cuyo path (String filePathOut) se facilita como argumento.
+	 * (Si se usa una estructura Map para albergar el diccionario de códigos).
+	 * @param input input
+	 * @param diccionarioCodigos diccionarioCodigos
+	 * @param filePathOut filePathOut
+	 * @param arbol arbol
+	 */
     public void codificar(char[] input, Map<Character,String> diccionarioCodigos, String filePathOut, ArbolHuffman arbol){
     	
     	EscritorBinario escritor = new EscritorBinario(filePathOut);
@@ -187,11 +201,13 @@ public class HuffmanEncoding {
         
     	escritor.cerrarFlujo();
     }
-    
-   /* 
-    * Serializar árbol de Huffman para recuperarlo posteriormente en la descompresión. Se
-    * escribe en la parte inicial del archivo de salida.
-    */
+
+	/**
+	 * Serializar árbol de Huffman para recuperarlo posteriormente en la descompresión. Se
+	 * escribe en la parte inicial del archivo de salida.
+	 * @param arbol arbol
+	 * @param escritor escritor
+	 */
     public void serializarArbol(ArbolHuffman arbol, EscritorBinario escritor){
     	
     	if (arbol.esHoja()) {
@@ -203,12 +219,15 @@ public class HuffmanEncoding {
     	serializarArbol(arbol.getIzquierdo(),escritor);
     	serializarArbol(arbol.getDerecho(),escritor);
     }
-    
-    /*
-    * Se lee el archivo de entrada (filePathIn, a descomprimir) como secuencia de bits 
-    * usando LectorBinario, después se descodifica usando el árbol final de Huffman y el resultado 
-    * se escribe con la clase EscritorBinario en el archivo de salida (filePathOut, descomprimido).
-    */
+
+
+	/**
+	 * Se lee el archivo de entrada (filePathIn, a descomprimir) como secuencia de bits
+	 * usando LectorBinario, después se descodifica usando el árbol final de Huffman y el resultado
+	 * se escribe con la clase EscritorBinario en el archivo de salida (filePathOut, descomprimido).
+	 * @param filePathIn filePathIn
+	 * @param filePathOut filePathOut
+	 */
     public void decode(String filePathIn, String filePathOut) {
     
     	LectorBinario lector = new LectorBinario(filePathIn);
@@ -234,7 +253,11 @@ public class HuffmanEncoding {
 
     	escritor.cerrarFlujo();
     }
-    
+	/**
+	 *lee el arbol usando el lector binario
+	 * @param lector lector
+	 * @return  ArbolHuffman
+	 */
     public ArbolHuffman leerArbol(LectorBinario lector) {
     	
     	boolean esHoja = lector.leerBit();

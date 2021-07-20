@@ -6,10 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /***************************************************************************************
- *  
+ *
  *  Utilidad: Permite la lectura de palabras de 8 bits de un archivo de entrada, cuyo
  *  		  path se proporciona.
- *
+ *  @author JaimePerezS/Codificacion-Huffman
  **************************************************************************************/
 
 public final class LectorBinario {
@@ -20,10 +20,10 @@ public final class LectorBinario {
     							 // palabra de 8 bits leída. 
     
     private int numBitsOcupados; // Número de bits ocupados en el buffer.
-    
-     /**  
+
+    /**
      * Constructor.
-     * @throws RuntimeException Si La ruta del archivo de entrada no es correcta o no existe.
+     * @param pathName pathName
      */
     public LectorBinario(String pathName){
     	
@@ -47,7 +47,7 @@ public final class LectorBinario {
             numBitsOcupados = -1;
         }
     }
-    
+
     /**
      * Cierra el flujo de entrada y libera los recursos del sistema asociados.
      */
@@ -60,7 +60,7 @@ public final class LectorBinario {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * @return true si y solo si no queda flujo de entrada (EOF).
      */
@@ -95,7 +95,7 @@ public final class LectorBinario {
         x |= (buffer >>> numBitsOcupados);
         return (char) (x & 0xff);
     }
-    
+
     /**
      * Lee el próximo bit en el archivo de entrada y lo devuelve como booleano.
      *
@@ -111,7 +111,7 @@ public final class LectorBinario {
         	llenarBuffer();
         return bit;
     }
-    
+
     /**
      * Lee la próxima palabra de 32 bits en el archivo de entrada.
      *

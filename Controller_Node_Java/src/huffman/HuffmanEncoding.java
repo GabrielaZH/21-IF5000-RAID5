@@ -253,7 +253,10 @@ public class HuffmanEncoding {
 
     	escritor.cerrarFlujo();
     }
-    
+	/**
+	 *lee el arbol usando el lector binario
+	 * @param lector lector
+	 */
     public ArbolHuffman leerArbol(LectorBinario lector) {
     	
     	boolean esHoja = lector.leerBit();

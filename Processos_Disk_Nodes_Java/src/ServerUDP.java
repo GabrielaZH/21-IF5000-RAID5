@@ -5,7 +5,15 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
+/***************************************************************************************
+ *
+ *  Utility: Execution
+ *  @author GabrielaZH-JoseKatoche/21-IF5000-RAID5
+ **************************************************************************************/
 
+/**
+ * Where a socket is created
+ */
 public class ServerUDP {
    final int PORT = 16787;
    public DatagramSocket udpSocket; // Socket open for UDP
@@ -50,7 +58,13 @@ public class ServerUDP {
       ServerUDP cs = new ServerUDP();
    }
 
-
+   /**
+    * Where a socket is created and receives and sends to the Controller_Node_Java
+    * In case you receive a file with the word nodes, then it extracts the number of nodes to create
+    * In case of receiving a .txt then it takes the name of the file
+    * In case of receiving a receiveRequest, send files to Controller_Node_Java
+    * In case of not receiving a receiveRequest, save files in disks
+    */
   public class UDPThread extends Thread {
 
 
@@ -80,7 +94,7 @@ public class ServerUDP {
 
                receivedMsg= readFile(decodeFile(pathFiles+"fileEncode.txt",pathFiles+"fileDecode.txt"));//read data in file
 
-               //TODO Recibir archivo con numero de nodos
+
                String nodos= "";
 
                if (receivedMsg.contains("nodes:")) {
@@ -167,7 +181,10 @@ public class ServerUDP {
       }//end of run 
    }//end of UDP thread
 
-
+   /**
+    * That sends an array of bytes via udp to Controller_Node_Java
+    * @param outgoingByte bytes of the file to send
+    */
    public void sendMessageToClients(byte[] outgoingByte)  {
     try {
 
@@ -203,7 +220,12 @@ public class ServerUDP {
          System.out.println(ioe.getMessage());
       }
    }
-
+   /**
+    * Decode a file with huffman
+    * @param pathFileEncode encoded file path
+    * @param pathFileDecode decoded file path
+    * @return decoded file path
+    */
 public String decodeFile(String pathFileEncode, String pathFileDecode){
    File fileEncode = new File(pathFileEncode);
    try (OutputStream os = new FileOutputStream(fileEncode)) {
@@ -216,7 +238,12 @@ public String decodeFile(String pathFileEncode, String pathFileDecode){
    huffman.decode(pathFileEncode,pathFileDecode);
    return pathFileDecode;
 }
-
+   /**
+    * Encode a file with huffman
+    * @param pathFileEncoded encoded file
+    * @param pathFileDecodeNameFile filename to encode
+    * @return encoded file
+    */
 public String encodeFile(String pathFileEncoded, String pathFileDecodeNameFile){
    File fileSaved= new File(pathFileDecodeNameFile);
    HuffmanEncoding huffman = new HuffmanEncoding();//encode the file
@@ -225,12 +252,21 @@ public String encodeFile(String pathFileEncoded, String pathFileDecodeNameFile){
    huffman.encoding(fileSaved.getPath(),fileOutPath);
    return pathFileEncoded;
 }
+   /**
+    * Get current time
+    * @return current time
+    */
    public String getCurrentTime() {
       String time =
               new SimpleDateFormat("hh:mm:ss").format(Calendar.getInstance().getTime());
       return time;
    }
 
+   /**
+    * Read a specific file
+    * @param path path where you will save the file
+    * @return contents of a file
+    */
    public String readFile(String path) {
     String text="";
       try {
