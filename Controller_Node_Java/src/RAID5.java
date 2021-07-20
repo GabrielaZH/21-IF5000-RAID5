@@ -1,20 +1,35 @@
 import java.io.*;
 import java.util.*;
 
+
+/***************************************************************************************
+ *
+ *  Utility: Allows you to divide a file into chunks with redundancy, similar to RAID5
+ *  @author GabrielaZH-JoseKatoche/21-IF5000-RAID5
+ **************************************************************************************/
+
 public class RAID5 {
 
-
-    /*Crea carpetas temporales de discos donde iran el archivo con el trozo del  libro y su paridad*/
+    /**
+     * Create disk folder where a piece of the file and its parity file will be inside
+     * @param disks disks folder to create
+     * @param path path where it will be saved
+     */
     public void createDisks(List<String> disks, String path){
         File disk;
         for (String name : disks){
             disk = new File(path, name);
             if (!disk.exists()){
-                if (!disk.mkdirs()) System.out.printf("%s não pode ser criado!\n", name);
+                if (!disk.mkdirs()) System.out.printf("%s Cant create!\n", name);
             }
         }
     }
 
+    /**
+     * Change a file to a byte array
+     * @param file to which you want to apply raid 5
+     * @return bytes of file
+     */
     public byte[] parseFileToByte(File file){
         int fileLength = (int)file.length();
         byte[] bytesArray = new byte[fileLength];
@@ -25,24 +40,31 @@ public class RAID5 {
             fileLikeStream.read(bytesArray, 0, fileLength);
 
         } catch (FileNotFoundException fnfex) {
-            System.out.println("Arquivo não encontrado!");
+            System.out.println("File finded!");
         } catch (IOException ioex) {
-            System.out.println("Erro inesperado!");
+            System.out.println("Unexpected error!");
         }
 
         return bytesArray;
     }
 
+    /**
+     * Change a file to a byte array
+     * @param bytesArray bytes of a file
+     * @param numberDisk disks created
+     * @param path path where it was saved
+     */
     public void saveFileWithRAID5(byte[] bytesArray, int numberDisk, String path){
-        //variaveis locais
+        //Variables
         List<Byte> fileParity = new ArrayList();
 
-        //CREA LAS LISTAS
+        //Create a list that saves byte list
         List<List<Byte>> superlist = new ArrayList<List<Byte>>();
         for (int i = 0; i < numberDisk; i++) {
             superlist.add(new ArrayList());
         }
 
+        //Add a byte to an array of bytes in an interleaved way starting with the last
         int countFile=numberDisk-1;
         for(byte element : bytesArray) {
             superlist.get(countFile).add(element);
@@ -55,7 +77,7 @@ public class RAID5 {
         int major = getMajorSize(superlist);
         completeDisks(superlist,major);
 
-
+        //Subtract bytes and add them into an array of bytes
         byte subtraction = 0;
         for (int i = 0; i < superlist.get(superlist.size()-1).size(); i++){
             subtraction = superlist.get(superlist.size()-1).get(i);
@@ -73,7 +95,13 @@ public class RAID5 {
         }
     }
 
-    //Recupera o disco com o disco de paridade REFATORADO
+    /**
+     * Find the damaged disk and recover it with parity file
+     * @param disks disks folder created
+     * @param path path where it was saved
+     * @param lastDisk last name folder created
+     * @return number of deleted folders
+     */
     public int findDiskCorrupted(List<String> disks,String path, String lastDisk){
         int countDiskCorrupted = countDiskCorrupted(disks,path);
         List<Integer> filesForBackUp = new ArrayList<>();
@@ -91,13 +119,19 @@ public class RAID5 {
                 }
             }
         }else if(countDiskCorrupted>=2){
-            System.out.println("Imposible recuperar el archivo, hay mas de un disco dañado!");
+            System.out.println("Unable to recover the file, there is more than one damaged disk!");
         }else{
-            System.out.println("Ningun disco está dañado!");
+            System.out.println("No disk is damaged!");
         }
         return countDiskCorrupted;
     }
 
+    /**
+     * Make a file from bytes
+     * @param disks disks folder created
+     * @param path path where it was saved
+     * @param fileRestored name of the file to restore
+     */
     public void remakeFile(List<String> disks, String path, String fileRestored) {
         boolean flag= true;
         int countFile=disks.size()-1;
@@ -143,12 +177,20 @@ public class RAID5 {
         }
     }
 
+    /**
+     * Recover a damaged file
+     * @param diskLose name of deleted disk folder
+     * @param numberFileBackUp number of files with which the damaged disk is going to be recovered
+     * @param path path where it was saved
+     * @param lastDisk last name folder created
+     */
     public void recoveryDisk(String diskLose, List<Integer> numberFileBackUp, String path, String lastDisk){
         try {
-            //Recrear el disco
+            //Recreate a disk folder
             createDisks(Arrays.asList(diskLose),path);
             int numberDiskLose = Integer.parseInt(diskLose.substring(4));
-            //Recrea el archivo dañado
+
+            //Recreate a file damaged
             File recoveredFile = new File(path + diskLose, "file"+numberDiskLose+".txt");
 
 
@@ -157,13 +199,14 @@ public class RAID5 {
                 scanners.add(new Scanner(new FileReader(new File(path + "DISK"+numberFileBackUp.get(i), "file"+numberFileBackUp.get(i)+".txt"))).useDelimiter("\\n"));
             }
 
-            //Get a ramdon disk number for recover parity
+            //Get a random number to get a parity file
             Random random = new Random();
             Integer numberRandom = numberFileBackUp.get(random.nextInt(numberFileBackUp.size()));
 
-            //Cria um leitor do arquivo de paridade para criar a paridade
+            //Create a parity file reader to create parity
             Scanner readFileParity = new Scanner(new FileReader(new File(path + "DISK"+numberRandom, "fileParity"+numberRandom+".txt"))).useDelimiter("\\n");
 
+            //Get the byte of a file
             List<Byte> bytesArrayFile = new ArrayList();
             while (readFileParity.hasNext()) {
                 List<Byte> bytesForRecover = new ArrayList();
@@ -181,13 +224,20 @@ public class RAID5 {
             }
 
             fillBytesFile(bytesArrayFile, recoveredFile);
-            System.out.println("\nRecuperando arquivo!");
-            System.out.println("Arquivo recuperado com sucesso!");
+            System.out.println("\nRecovered file!");
+            System.out.println("File recovered successfully!");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Recovers the bytes of the corrupted file from the other files and their parity
+     * @param bytesForRecover bytes to be passed to a file
+     * @param diskLose name of deleted disk folder
+     * @param lastDisk last name folder created
+     * @return byte retrieved
+     */
     private static Byte recoveredByte(List<Byte> bytesForRecover, String diskLose, String lastDisk) {
         byte result=0;
 
@@ -212,6 +262,12 @@ public class RAID5 {
         return result;
     }
 
+    /**
+     * Count a disk corrupted
+     * @param disks disks folder to create
+     * @param path path where it was saved
+     * @return number of damaged discs
+     */
     public int countDiskCorrupted(List<String> disks, String path) {
         int countCorrupted = 0;
         for (int i = 0; i < disks.size(); i++) {
@@ -221,6 +277,11 @@ public class RAID5 {
         return countCorrupted;
     }
 
+    /***
+     * Fill byte lists with zeros
+     * @param superlist byte list list
+     * @param major the larger size list
+     */
     public void completeDisks(List<List<Byte>> superlist, int major) {
         int substraction;
 
@@ -234,6 +295,11 @@ public class RAID5 {
         }
     }
 
+    /**
+     * Gets the maximum size of a list of byte lists
+     * @param superlist byte list list
+     * @return the larger size list
+     */
     public int getMajorSize(List<List<Byte>> superlist) {
         int major=superlist.get(0).size();
         for (int i = 1; i < superlist.size(); i++) {
@@ -244,6 +310,11 @@ public class RAID5 {
         return major;
     }
 
+    /**
+     * Fill a file with bytes
+     * @param bytesArray bytes to be passed to file
+     * @param file file name
+     */
     public void fillBytesFile(List<Byte> bytesArray, File file){
         try {
             PrintWriter w;
