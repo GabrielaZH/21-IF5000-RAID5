@@ -12,19 +12,19 @@ export class AppComponent {
   title = 'RAID';
   file:File;
   public bookList: Observable<Book[]>;
-
   dtOptions: DataTables.Settings = {};
+
+
   constructor(private clientService: ClientService) {
 
   }
 
   ngOnInit() {
-    this.getBooks()
+    this.getBooks();
     this.dtOptions = {
       pagingType: 'full_numbers'
     };
 
-   
   }
 
   getBooks() {
