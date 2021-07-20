@@ -50,7 +50,7 @@ public class Send {
 
 
 
-    public File getFile(String fileName) throws IOException {
+    public File getFile(String fileName, String numNodes) throws IOException {
         fileNameReceive=fileName;
         try {
             socket = new DatagramSocket();
@@ -58,6 +58,8 @@ public class Send {
             Thread s = new Thread(new FileSender(socket,HOST));
             r.start();
             s.start();
+
+            sendData("nodes:"+numNodes);
 
             //send file name
             sendData(fileName);
@@ -125,7 +127,6 @@ public class Send {
                     DatagramPacket packet = new DatagramPacket(buf, buf.length);
                     sock.receive(packet);
                     String  received = new String(packet.getData(), packet.getOffset(), packet.getLength());
-                    System.out.println(received.trim());
                 }
                 catch(Exception e) {
                     System.err.println(e);
@@ -165,7 +166,6 @@ public class Send {
                     huffman.decode(pathFileEncode,pathFileDecode);
 
                     pathFile=pathFileDecode;
-                    System.out.println(received.trim());
                 }
                 catch(Exception e) {
                     System.err.println(e);

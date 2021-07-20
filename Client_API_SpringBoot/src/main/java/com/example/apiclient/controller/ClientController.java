@@ -54,14 +54,26 @@ public class ClientController {
     }
 
     @RequestMapping(value = "/receiveFile")
-    public ResponseEntity<?> receiveFile(/*string file*/) throws IOException {
+    public ResponseEntity<?> receiveFile(/*string file*, int numNodes*/) throws IOException {
 
         Map<String, Object> response = new HashMap<>();
-        Send send = new Send();
+        try {
+            try {
+                Send send = new Send();
+                File file = new File("C:\\are.txt");
+                FileInputStream inputStream = new FileInputStream(file);
+                MultipartFile multipartFile = new MockMultipartFile(file.getName(), inputStream);
+                send.getFile("are.txt","8");
 
-        File fileReceived = send.getFile("are.txt");
-
-        return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+            } catch (Exception e) {
+                throw new RuntimeException("FAIL!");
+            }
+            response.put("message", "Successfully downloaded!");
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.put("message", e.getMessage().concat(":").concat(e.getMessage()));
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CONFLICT);
+        }
     }
 
 }

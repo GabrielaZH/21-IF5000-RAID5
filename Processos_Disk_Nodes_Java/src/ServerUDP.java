@@ -118,23 +118,44 @@ public class ServerUDP {
                   String numberDisk = filename.substring(filename.length()-1);
                   decodeFile(pathFiles + "fileEncode.txt", pathFiles +folderName+"\\DISK"+numberDisk+"\\"+ filename + ".txt");
 
-                  //response = "[" + newTimeStamp + "] IP:" + currentClientIP + " : File Receive from server" ;
-                  //sendMessageToClients( (response).getBytes());
+                  response = "[" + newTimeStamp + "] IP:" + currentClientIP + " : File Receive from server" ;
+                  sendMessageToClients( (response).getBytes());
 
                   //verify if the message is send the file
                }else if (receivedMsg.contains("receiveRequest")){
+                  File diskToDelete = new File(pathFiles + filename);
+                  String[] contents = diskToDelete.list();
 
-                  File finalFile= new File(encodeFile(pathFiles+"fileEncode.txt",pathFiles+filename+".txt"));
-                  FileInputStream source = new FileInputStream(finalFile);
-                  byte buf[]=new byte[60000];
-                  int i=0;
-                  while(source.available()!=0)
-                  {
-                     buf[i]=(byte)source.read();
-                     i++;
+                  for (int i = 0; i < numNodos; i++) {
+                     File finalFile;
+                     File finalFileB;
+
+                     if(new File(pathFiles+filename+"\\DISK"+i+"\\file"+i+".txt").exists()){
+                        finalFile= new File(encodeFile(pathFiles+"fileEncode.txt",pathFiles+filename+"\\DISK"+i+"\\file"+i+".txt"));
+                        FileInputStream source = new FileInputStream(finalFile);
+                        byte buf[]=new byte[60000];
+                        int j=0;
+                        while(source.available()!=0)
+                        {
+                           buf[j]=(byte)source.read();
+                           j++;
+                        }
+                        source.close();
+                        sendMessageToClients(buf);
+
+                        finalFileB= new File(encodeFile(pathFiles+"fileEncode.txt",pathFiles+filename+"\\DISK"+i+"\\fileParity"+i+".txt"));
+                        FileInputStream sourceB = new FileInputStream(finalFileB);
+                        byte bufB[]=new byte[60000];
+                        j=0;
+                        while(sourceB.available()!=0)
+                        {
+                           bufB[j]=(byte)sourceB.read();
+                           j++;
+                        }
+                        sourceB.close();
+                        sendMessageToClients(bufB);
+                     }
                   }
-                  source.close();
-                  sendMessageToClients(buf);
                }
             }//end of try
             catch (IOException i ) {
