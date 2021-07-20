@@ -9,7 +9,7 @@ import java.io.IOException;
  *  
  *  Utilidad: Permite la lectura de palabras de 8 bits de un archivo de entrada, cuyo
  *  		  path se proporciona.
- *
+ *  @author JaimePerezS/Codificacion-Huffman
  **************************************************************************************/
 
 public final class LectorBinario {
@@ -20,10 +20,10 @@ public final class LectorBinario {
     							 // palabra de 8 bits leída. 
     
     private int numBitsOcupados; // Número de bits ocupados en el buffer.
-    
-     /**  
+
+    /**
      * Constructor.
-     * @throws RuntimeException Si La ruta del archivo de entrada no es correcta o no existe.
+     * @param pathName pathName
      */
     public LectorBinario(String pathName){
     	
