@@ -129,7 +129,13 @@ public class ServerUDP {
 
                   //verify if the message is the content file for save
                } else if(!receivedMsg.contains("receiveRequest")){
-                  String numberDisk = filename.substring(filename.length()-1);
+
+                  String numberDisk;
+                  if(filename.contains("fileParity")){
+                     numberDisk = filename.replaceAll("fileParity","");
+                  }else{
+                     numberDisk = filename.replaceAll("file","");
+                  }
                   decodeFile(pathFiles + "fileEncode.txt", pathFiles +folderName+"\\DISK"+numberDisk+"\\"+ filename + ".txt");
 
                   response = "[" + newTimeStamp + "] IP:" + currentClientIP + " : File Receive from server" ;
