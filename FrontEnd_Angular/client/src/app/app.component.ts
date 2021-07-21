@@ -3,6 +3,7 @@ import { Book } from './models/book.model';
 import {Observable} from "rxjs";
 import {ClientService} from './services/client.service';
 import Swal from 'sweetalert2';
+import { FormBuilder, FormGroup } from "@angular/forms";
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -11,12 +12,11 @@ import Swal from 'sweetalert2';
 export class AppComponent {
   title = 'RAID';
   file:File;
+  nodes:string;
   public bookList: Observable<Book[]>;
   dtOptions: DataTables.Settings = {};
-
-
-  constructor(private clientService: ClientService) {
-
+  placeholder='número de nodos'
+  constructor(private clientService: ClientService,private fb:FormBuilder) {
   }
 
   ngOnInit() {
@@ -24,7 +24,6 @@ export class AppComponent {
     this.dtOptions = {
       pagingType: 'full_numbers'
     };
-
   }
 
   getBooks() {
@@ -33,11 +32,15 @@ export class AppComponent {
   selectFile(event:any) {
     this.file = event.target.files.item(0);
   }
+  onKey(event: any) {
+    const inputValue = event.target.value;
+    this.nodes=inputValue;
+  }
 
 
   upload() {
     this.showLoading();
-    this.clientService.upload(this.file).subscribe((result) => {
+    this.clientService.upload(this.file,this.nodes).subscribe((result) => {
       if(result){
         Swal.fire({
           title: 'Uploaded',
@@ -55,6 +58,30 @@ export class AppComponent {
       }
     });
   }
+
+
+  request(name: any, numNodes:any ) {
+    this.showLoading();
+    console.log(numNodes,name)
+    this.clientService.getBook(name,numNodes).subscribe((result) => {
+      if(result){
+        Swal.fire({
+          title: 'Uploaded',
+          icon: 'success',
+          timer: 1000,
+        });
+        return true;
+      }else{
+        Swal.fire({
+          title: 'Sorry, try again!',
+          icon: 'error',
+          timer: 1000,
+        });
+        return false;
+      }
+    });
+  }
+
 
   showLoading(){
     Swal.fire({

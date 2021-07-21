@@ -1,8 +1,11 @@
 export class Book{
 
     public id!: number;
-    public name: string | undefined;
-    public description:string | undefined;
+    public name: String | undefined;
+    public date:Date | undefined;
+    public author:String | undefined;
+    public nodes:Number | undefined;
+
 
     
 }
