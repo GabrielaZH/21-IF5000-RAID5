@@ -125,7 +125,7 @@ public class ServerUDP {
                   raid5.saveFileWithRAID5(fileLikeByte,disks.size(),pathFiles);
                   long time = 0;
                   if (numNodos<=8){
-                     time = 1500;
+                     time = 5000;
                   }else if(numNodos<=16){
                      time = 10000;
                   }
@@ -145,6 +145,8 @@ public class ServerUDP {
                      String[] contents = diskToDelete.list();
                      for (String content : contents){
                         Files.delete(Paths.get(pathFiles+"DISK"+i+"\\"+content));
+                        Files.delete(Paths.get(pathFiles+"DISK"+i));
+
                      }
                   }
                   Files.delete(Paths.get(pathFiles+filename+".txt"));
@@ -180,7 +182,7 @@ public class ServerUDP {
                      x++;
                   }
 
-                  send.getFile("are.txt",numRejected, numNodos+"");
+                  send.getFile(filename+".txt",numRejected, numNodos+"");
                   Thread.sleep(time);
 
                   List<String> disks = new ArrayList<>();

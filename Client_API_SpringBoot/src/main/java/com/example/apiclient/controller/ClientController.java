@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
@@ -82,12 +83,13 @@ public class ClientController {
      * @throws IOException Exception
      */
     @RequestMapping(value = "/receiveFile")
-    public ResponseEntity<?> receiveFile(@RequestParam("file") String file, @RequestParam("numNodes")String numNodes) throws IOException {
-
+    @Async
+    public  ResponseEntity<?> receiveFile(@RequestParam("file") String file, @RequestParam("numNodes")String numNodes) throws IOException, InterruptedException {
         Map<String, Object> response = new HashMap<>();
         File filereceive ;
         try {
             try {
+
                 Send send = new Send();
                 filereceive = send.getFile(file+".txt",numNodes);
 
@@ -95,14 +97,14 @@ public class ClientController {
                 throw new RuntimeException("FAIL!");
             }
             response.put("message", "Successfully downloaded!");
+           // File file1 = new File("C:\\21-IF5000-RAID5\\Client_API_SpringBoot\\filesReceive\\La vida es sueño - Calderón de la Barca.txt.txt");
+            Path path = filereceive.toPath();
 
-            File f= new File("C:\\FUENTEOVEJUNA LOPE DE VEGA.txt");
-            Path path = f.toPath();
-
+            Thread.sleep(10000L);
 
             Resource resource = new UrlResource(path.toUri());
             HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.add("File-Name", f.getName());
+            httpHeaders.add("File-Name", filereceive.getName());
             httpHeaders.add(CONTENT_DISPOSITION, "attachment;File-Name=" + resource.getFilename());
             return ResponseEntity.ok().contentType(MediaType.parseMediaType(Files.probeContentType(path)))
                     .headers(httpHeaders).body(resource);

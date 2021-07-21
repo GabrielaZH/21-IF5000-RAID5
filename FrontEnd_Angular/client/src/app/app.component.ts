@@ -61,7 +61,6 @@ export class AppComponent {
 
 
   request(name: any, numNodes:any ) {
-   // this.showLoading();
     console.log(numNodes,name)
     this.clientService.getBook(name,numNodes).subscribe(blob => saveAs(blob, name));
   }

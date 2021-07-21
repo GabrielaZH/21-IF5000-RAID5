@@ -72,7 +72,8 @@ public class Send {
         } catch(NullPointerException npe){
             throw npe;
         }
-        File fileReceived= new File(pathFileSave+"tempNameFile.txt");
+        //fileName=fileName.replaceFirst(".txt","");
+        File fileReceived= new File(pathFileReceive+fileName);
         return fileReceived;
     }
 
@@ -164,6 +165,8 @@ public class Send {
                     File file = new File(pathFileDecode);
                     HuffmanEncoding huffman = new HuffmanEncoding();
                     huffman.decode(pathFileEncode,pathFileDecode);
+
+                    Thread.currentThread().wait(1000);
 
                     pathFile=pathFileDecode;
                 }
