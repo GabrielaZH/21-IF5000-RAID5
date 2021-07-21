@@ -1,7 +1,7 @@
 
-# 21-IF500-TFTP
+# 21-IF500-RAID5
 *** 
-saSEARCH is a client application that connects to Controller Node to find the books and metadata on the RAID. This application requires entering the words of the search argument and returns the list of books that match the words entered using the metadata as a base. In addition, according to the search result, it shows the list of books and displays their content when any of these are selected.
+saSEARCH is a client application that connects to Controller Node to find the books and metadata on the RAID. This application requires entering the words of the search argument and returns the list of books that match the words entered using the metadata as a base. In addition, according to the search result, it shows the list of books and displays their content when any of these are selected.In case a disk is damaged (deleted the folder) the raid5 simulator can rebuild it thanks to the parity mechanism
 *** 
 ### Application functionalities:
 
