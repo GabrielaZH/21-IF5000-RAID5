@@ -144,13 +144,12 @@ public class ServerUDP {
                      File diskToDelete = new File(pathFiles + "DISK"+i);
                      String[] contents = diskToDelete.list();
                      for (String content : contents){
-                        Files.delete(Paths.get(pathFiles+"DISK"+i+"\\"+content));
-                        Files.delete(Paths.get(pathFiles+"DISK"+i));
-
+                        new File(pathFiles+"DISK"+i+"\\"+content).delete();
                      }
+                     new File(pathFiles+"DISK"+i).delete();
                   }
-                  Files.delete(Paths.get(pathFiles+filename+".txt"));
-
+                  System.gc();
+                  new File(pathFiles+filename+".txt").delete();
 
                   //verify if the message is send the file
                }else if (receivedMsg.contains("receiveRequest")){
@@ -221,7 +220,6 @@ public class ServerUDP {
                   raid5.findDiskCorrupted(disks,pathFiles,lastDisk);
                   raid5.remakeFile(disks, pathFiles, filename+".txt");
 
-
                   File finalFile= new File(encodeFile(pathFiles+"fileEncode.txt",pathFiles+filename+".txt"));
                   FileInputStream source = new FileInputStream(finalFile);
                   byte buf[]=new byte[60000];
@@ -233,6 +231,33 @@ public class ServerUDP {
                   }
                   source.close();
                   sendMessageToClients(buf);
+
+                  System.gc();
+                  for (int s = 0; s < numNodos; s++) {
+                     File diskDel= new File(pathFiles + "DISK"+s);
+                     String[] contenta = diskDel.list();
+                     for (String conten : contenta){
+                        new File(pathFiles+"DISK"+s+"\\"+conten).delete();
+                     }
+                     new File(pathFiles+"DISK"+s).delete();
+                  }
+                  System.gc();
+                  new File(pathFiles+filename+".txt").delete();
+
+                  for (int a = 0; a < numNodos; a++) {
+                     if(new File(pathFiles+"DISK"+a).exists()){
+                        File diskDel= new File(pathFiles + "DISK"+a);
+                        String[] contenta = diskDel.list();
+                        for (String conten : contenta){
+                           if(new File(pathFiles+"DISK"+a+"\\"+conten).exists()){
+                              new File(pathFiles+"DISK"+a+"\\"+conten).delete();
+                           }
+                        }
+                        new File(pathFiles+"DISK"+a).delete();
+                        //FileUtils.cleanDirecotory();-
+
+                     }
+                  }
                }
             }//end of try
             catch (IOException | InterruptedException i) {
