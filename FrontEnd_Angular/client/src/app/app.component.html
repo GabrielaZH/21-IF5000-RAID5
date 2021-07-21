@@ -16,7 +16,7 @@
 
 
             <div class="mt-2 col-md-6">
-                <button type="button" (click)="upload()" class="btn btn-success">Upload</button>
+                <button type="button" (click)="upload()" class="btn btn-success">Subir</button>
             </div>
         </form>
         <br>
@@ -38,7 +38,7 @@
                     <td>{{ book.nodes}}</td>
 
                     <td>
-                        <button class="btn-secondary btn" (click)="request(book.name,book.nodes)"><i class="fas fa-book"
+                        <button class="btn-danger btn" (click)="request(book.name,book.nodes)" title="Descargar"><i class="fas fa-file-download"
                                 style="color:white"></i></button>
                     </td>
                 </tr>
