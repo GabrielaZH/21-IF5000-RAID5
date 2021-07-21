@@ -31,11 +31,11 @@ public class Send {
             sendData("nodes:"+numNodes);
 
             //send file name
-            sendData(file.getName());
+            sendData(file.getOriginalFilename());
 
             //send data file
             saveFile(file,pathFileSave);
-            File fileSaved= new File(pathFileSave+file.getName());
+            File fileSaved= new File(pathFileSave+file.getOriginalFilename());
             File fileOut= new File(pathFileSave+"out.txt");
             huffman.encoding(fileSaved.getPath(),pathFileSave+"out.txt");
             File finalFile= new File(pathFileSave+"out.txt");
