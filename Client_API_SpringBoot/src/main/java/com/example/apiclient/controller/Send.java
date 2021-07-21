@@ -175,7 +175,7 @@ public class Send {
     }//end of ClassFileReceiver
 
     public void saveFile(MultipartFile file, String path)  {
-        File fileToSave = new File(path+file.getName());
+        File fileToSave = new File(path+file.getOriginalFilename());
         try (OutputStream os = new FileOutputStream(fileToSave)) {
             InputStream initialStream = file.getInputStream();
             byte[] buffer = new byte[initialStream.available()];

@@ -44,15 +44,14 @@ export class AppComponent {
       if(result){
         Swal.fire({
           title: 'Uploaded',
-          icon: 'success',
-          timer: 1000,
+          icon: 'success'
         });
+        this.getBooks();
         return true;
       }else{
         Swal.fire({
           title: 'Sorry, try again!',
-          icon: 'error',
-          timer: 1000,
+          icon: 'error'
         });
         return false;
       }
@@ -67,15 +66,13 @@ export class AppComponent {
       if(result){
         Swal.fire({
           title: 'Uploaded',
-          icon: 'success',
-          timer: 1000,
+          icon: 'success'
         });
         return true;
       }else{
         Swal.fire({
           title: 'Sorry, try again!',
-          icon: 'error',
-          timer: 1000,
+          icon: 'error'
         });
         return false;
       }
