@@ -45,12 +45,14 @@ getBooks(): Observable<any>{
   const url = `${base_url}/client/books`;
   return this.http.get(url);
 }
-getBook(file:string,numNodes:string): Observable<any>{
+getBook(file:string,numNodes:string): Observable<Blob> {
   let formData: FormData = new FormData();
   formData.append("file", file);
   formData.append("numNodes",numNodes)
   const url = `${base_url}/client/receiveFile`;
-  return this.http.post(url,formData);
+  return this.http.post(url,formData, {
+    responseType: 'blob'
+  });
 }
 
 

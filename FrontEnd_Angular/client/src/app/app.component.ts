@@ -4,6 +4,7 @@ import {Observable} from "rxjs";
 import {ClientService} from './services/client.service';
 import Swal from 'sweetalert2';
 import { FormBuilder, FormGroup } from "@angular/forms";
+import { saveAs } from 'file-saver';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -60,23 +61,9 @@ export class AppComponent {
 
 
   request(name: any, numNodes:any ) {
-    this.showLoading();
+   // this.showLoading();
     console.log(numNodes,name)
-    this.clientService.getBook(name,numNodes).subscribe((result) => {
-      if(result){
-        Swal.fire({
-          title: 'Uploaded',
-          icon: 'success'
-        });
-        return true;
-      }else{
-        Swal.fire({
-          title: 'Sorry, try again!',
-          icon: 'error'
-        });
-        return false;
-      }
-    });
+    this.clientService.getBook(name,numNodes).subscribe(blob => saveAs(blob, name));
   }
 
 

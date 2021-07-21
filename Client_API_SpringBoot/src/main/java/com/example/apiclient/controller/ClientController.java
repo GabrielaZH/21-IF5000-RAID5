@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -94,13 +95,16 @@ public class ClientController {
                 throw new RuntimeException("FAIL!");
             }
             response.put("message", "Successfully downloaded!");
-            //return ResponseEntity.ok().body(filereceive);
 
-            Resource resource = new UrlResource(filereceive.getPath());
+            File f= new File("C:\\FUENTEOVEJUNA LOPE DE VEGA.txt");
+            Path path = f.toPath();
+
+
+            Resource resource = new UrlResource(path.toUri());
             HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.add("File-Name", filereceive.getName());
+            httpHeaders.add("File-Name", f.getName());
             httpHeaders.add(CONTENT_DISPOSITION, "attachment;File-Name=" + resource.getFilename());
-            return ResponseEntity.ok().contentType(MediaType.parseMediaType(filereceive.getPath()))
+            return ResponseEntity.ok().contentType(MediaType.parseMediaType(Files.probeContentType(path)))
                     .headers(httpHeaders).body(resource);
 
         } catch (Exception e) {
