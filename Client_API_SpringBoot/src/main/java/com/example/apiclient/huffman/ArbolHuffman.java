@@ -1,10 +1,10 @@
 package com.example.apiclient.huffman;
 
 /***************************************************************************************
- *  
- *  ArbolHuffman: Estructura de datos recursiva para representar un árbol binario
- *  de Huffman. 
- *  
+ *
+ *  ArbolHuffman: Estructura de datos recursiva para representar un arbol binario
+ *  de Huffman.
+ *  @author JaimePerezS/Codificacion-Huffman
  *
  **************************************************************************************/
 
@@ -14,8 +14,12 @@ public class ArbolHuffman implements Comparable<ArbolHuffman> {
 	private final int frecuencia;
 	private final ArbolHuffman izquierdo, derecho;
 
-	/**  
-	 * Constructor.
+	/**
+	 * Constructor
+	 * @param simbolo simbolo
+	 * @param frecuencia de aparicion
+	 * @param izquierdo arbol izauierdo
+	 * @param derecho arbol derecho
 	 */
 	public ArbolHuffman(char simbolo, int frecuencia, ArbolHuffman izquierdo, ArbolHuffman derecho) {
 		this.simbolo    = simbolo;
@@ -24,28 +28,27 @@ public class ArbolHuffman implements Comparable<ArbolHuffman> {
 		this.derecho = derecho;
 	}
 	
-	public ArbolHuffman(){ // Árbol vacío
+	public ArbolHuffman(){
 		this('\0',0,null,null);
 	}
-
 	/**
 	 * Si el árbol actual no contiene subárboles derecho e izquierdo.
-	 * 
-     * @return true si y solo es un nodo hoja
-     */
+	 *
+	 * @return true si y solo es un nodo hoja
+	 */
 	public boolean esHoja() {
 		return (izquierdo == null) && (derecho == null);
 	}
 
 	/**
-	 * Permite comparar árboles de Huffman, según frecuencia de aparición en la trama a codificar. 
-	 * Necesario para la estructura cola de prioridad donde se albergan los árboles de Huffman 
+	 * Permite comparar árboles de Huffman, según frecuencia de aparición en la trama a codificar.
+	 * Necesario para la estructura cola de prioridad donde se albergan los árboles de Huffman
 	 * durante su construcción.
-	 * 
-     * @return >0 si la frecuencia de este árbol(this) es mayor que la del segundo (otro);
-     * 		   =0 si tienen la misma frecuencia;
-     * 		   <0 si si la frecuencia de este árbol(this) es menor que la del segundo (otro);
-     */
+	 *
+	 * @return mayor que 0 si la frecuencia de este arbol(this) es mayor que la del segundo (otro);
+	 * 		   igual que 0 si tienen la misma frecuencia;
+	 * 		   menor que 0 si si la frecuencia de este arbol(this) es menor que la del segundo (otro);
+	 */
 	public int compareTo(ArbolHuffman otro) {
 		return this.frecuencia - otro.frecuencia;
 	}

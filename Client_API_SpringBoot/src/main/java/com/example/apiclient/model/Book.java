@@ -1,6 +1,7 @@
 package com.example.apiclient.model;
 
 import javax.persistence.*;
+import java.sql.Date;
 
 @Entity
 @Table(name = "Book")
@@ -11,19 +12,22 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
-    private String description;
+    private Date date;
+    private String author;
+    private Short nodes;
 
 
-    public Book(int id, String name, String description) {
+    public Book(int id, String name, Date date, String author, Short nodes) {
         this.id = id;
         this.name = name;
-        this.description = description;
+        this.date = date;
+        this.author = author;
+        this.nodes = nodes;
     }
+
 
     public Book() {
     }
-
-
 
     public int getId() {
         return id;
@@ -41,13 +45,28 @@ public class Book {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public Date getDate() {
+        return date;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public Short getNodes() {
+        return nodes;
+    }
+
+    public void setNodes(Short nodes) {
+        this.nodes = nodes;
+    }
 
 }

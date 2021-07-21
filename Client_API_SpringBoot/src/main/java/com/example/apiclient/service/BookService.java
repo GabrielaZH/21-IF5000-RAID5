@@ -20,6 +20,6 @@ public class BookService {
     public List<Book> listAll(){return repository.findAll();}
     public Book get (int id){ return repository.findById(id).get();}
     public void delete(int id){repository.deleteById(id);}
-
+    public void save(Book book){repository.save(book);}
 
 }

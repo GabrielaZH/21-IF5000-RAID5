@@ -12,6 +12,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Date;
 import java.util.*;
 
 
@@ -28,19 +29,30 @@ public class ClientController {
         return service.listAll();
     }
 
+    /**
+     * Receive file from FrontEnd_Angular and upload to Controller_Node_Java
+     * @param file file is the received
+     * @param numNodes num nodes received
+     * @return ResponseEntity with status
+     */
     @RequestMapping(value = "/uploadFile")
-    public ResponseEntity<?> uploadFile(/*@RequestParam("file") MultipartFile file, String numNodes*/) {
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file,@RequestParam("numNodes") String numNodes ) {
         Map<String, Object> response = new HashMap<>();
         try {
             try {
 
-                Send send = new Send();
 
-                //MultipartFile multipartFile = new MockMultipartFile((file.getOriginalFilename()), file.getInputStream());
-                File file = new File("C:\\are.txt");
-                FileInputStream inputStream = new FileInputStream(file);
-                MultipartFile multipartFile = new MockMultipartFile(file.getName(), inputStream);
-                send.sendFile(multipartFile, "8");
+                Send send = new Send();
+                send.sendFile(file, numNodes);
+                Book book= new Book();
+                book.setName(file.getOriginalFilename());
+                book.setAuthor(file.getName());
+                java.util.Date utilDate = new java.util.Date();
+                java.sql.Date sDate = new java.sql.Date(utilDate.getTime());
+                book.setDate(sDate);
+                book.setNodes(Short. parseShort(numNodes));
+                service.save(book);
+
             } catch (Exception e) {
                 throw new RuntimeException("FAIL!");
             }
@@ -53,23 +65,28 @@ public class ClientController {
 
     }
 
+    /**
+     * receives files from  Controller_Node_Java
+     * @param file file is the received
+     * @param numNodes num nodes received
+     * @return ResponseEntity with file
+     * @throws IOException Exception
+     */
     @RequestMapping(value = "/receiveFile")
-    public ResponseEntity<?> receiveFile(/*string file*, int numNodes*/) throws IOException {
+    public ResponseEntity<?> receiveFile(@RequestParam("file") String file, @RequestParam("numNodes")String numNodes) throws IOException {
 
         Map<String, Object> response = new HashMap<>();
+        File filereceive ;
         try {
             try {
                 Send send = new Send();
-                File file = new File("C:\\are.txt");
-                FileInputStream inputStream = new FileInputStream(file);
-                MultipartFile multipartFile = new MockMultipartFile(file.getName(), inputStream);
-                send.getFile("are.txt","8");
+                filereceive = send.getFile(file+".txt",numNodes);
 
             } catch (Exception e) {
                 throw new RuntimeException("FAIL!");
             }
             response.put("message", "Successfully downloaded!");
-            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+            return ResponseEntity.ok().body(filereceive);
         } catch (Exception e) {
             response.put("message", e.getMessage().concat(":").concat(e.getMessage()));
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CONFLICT);
