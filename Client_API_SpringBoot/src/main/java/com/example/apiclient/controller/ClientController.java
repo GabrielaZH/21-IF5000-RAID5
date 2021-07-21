@@ -4,17 +4,25 @@ import com.example.apiclient.model.Book;
 import com.example.apiclient.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockMultipartFile;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
-import java.nio.file.Files;
+
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Date;
 import java.util.*;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+
+import java.io.IOException;
+
+import java.util.List;
+
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping(path = "/api/client")
@@ -86,7 +94,15 @@ public class ClientController {
                 throw new RuntimeException("FAIL!");
             }
             response.put("message", "Successfully downloaded!");
-            return ResponseEntity.ok().body(filereceive);
+            //return ResponseEntity.ok().body(filereceive);
+
+            Resource resource = new UrlResource(filereceive.getPath());
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("File-Name", filereceive.getName());
+            httpHeaders.add(CONTENT_DISPOSITION, "attachment;File-Name=" + resource.getFilename());
+            return ResponseEntity.ok().contentType(MediaType.parseMediaType(filereceive.getPath()))
+                    .headers(httpHeaders).body(resource);
+
         } catch (Exception e) {
             response.put("message", e.getMessage().concat(":").concat(e.getMessage()));
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CONFLICT);
