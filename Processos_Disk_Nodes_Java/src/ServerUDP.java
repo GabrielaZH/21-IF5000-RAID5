@@ -17,9 +17,9 @@ import java.text.SimpleDateFormat;
 public class ServerUDP {
    final int PORT = 16787;
    public DatagramSocket udpSocket; // Socket open for UDP
-   public ArrayList<InetAddress> clientIPs; //List of IP addresses
-   public ArrayList<Integer> clientPorts; //List of Ports
-   public HashSet<String> connectedClients;//List of clients
+   public InetAddress clientIPs; //List of IP addresses
+   public Integer clientPorts; //List of Ports
+   public String connectedClients;//List of clients
 
    InetAddress currentClientIP;
    int currentClientPort ;
@@ -40,9 +40,9 @@ public class ServerUDP {
       try {
          //UDP
          udpSocket = new DatagramSocket(PORT);
-         clientIPs = new ArrayList();
-         clientPorts = new ArrayList();
-         connectedClients = new HashSet();
+         clientIPs = null;
+         clientPorts = 0;
+         connectedClients = "";
 
          UDPThread udpThread = new UDPThread();
          udpThread.start();
@@ -199,26 +199,23 @@ public class ServerUDP {
 
        //Add the client to list of connected clients,
        //And store their IP and PORT
-       if (!connectedClients.contains(currentClient)) {
-          connectedClients.add(currentClient);
-          clientIPs.add(currentClientIP);
-          clientPorts.add(currentClientPort);
-          System.out.println("Added new client | " + currentClient);
-       }
+
+       connectedClients = currentClient;
+       clientIPs = currentClientIP;
+       clientPorts = currentClientPort;
+       System.out.println("Added new client | " + currentClient);
 
        //For every client connected
-       for (int i = 0; i < clientIPs.size(); i++) {
-          //get their IP and Port
-          InetAddress clientIp = clientIPs.get(i);
-          int clientPort = clientPorts.get(i);
+       //get their IP and Port
+       InetAddress clientIp = clientIPs;
+       int clientPort = clientPorts;
 
-          //construct Packet
-          udpPacket = new DatagramPacket(outgoingByte, outgoingByte.length, clientIp, clientPort);
-          //send message out
-          udpSocket.send(udpPacket);
+       //construct Packet
+       udpPacket = new DatagramPacket(outgoingByte, outgoingByte.length, clientIp, clientPort);
+       //send message out
+       udpSocket.send(udpPacket);
 
-          System.out.println("Message sent to client #" + i);
-       }//end of for
+       System.out.println("Message sent to client #" + 0);
 
        System.out.println("\nSuccessfully sent message to all Clients!\n\n");
 

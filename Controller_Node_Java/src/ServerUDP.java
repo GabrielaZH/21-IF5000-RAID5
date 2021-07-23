@@ -151,6 +151,19 @@ public class ServerUDP {
                   System.gc();
                   new File(pathFiles+filename+".txt").delete();
 
+                  for (int a = 0; a < numNodos; a++) {
+                     if(new File(pathFiles+"DISK"+a).exists()){
+                        File diskDel= new File(pathFiles + "DISK"+a);
+                        String[] contenta = diskDel.list();
+                        for (String conten : contenta){
+                           if(new File(pathFiles+"DISK"+a+"\\"+conten).exists()){
+                              new File(pathFiles+"DISK"+a+"\\"+conten).delete();
+                           }
+                        }
+                        new File(pathFiles+"DISK"+a).delete();
+                     }
+                  }
+
                   //verify if the message is send the file
                }else if (receivedMsg.contains("receiveRequest")){
                   Send send = new Send();
@@ -158,7 +171,7 @@ public class ServerUDP {
                   if (numNodos<=8){
                      time = 1500*2;
                   }else if(numNodos<=16){
-                     time = 10000*2;
+                     time = 2000*2;
                   }
 
                   //Get files from nodes with encription
@@ -167,12 +180,18 @@ public class ServerUDP {
 
                   File diskToDel = new File("C:\\21-IF5000-RAID5\\Processos_Disk_Nodes_Java\\filesReceive\\" +filename);
                   String[] contente = diskToDel.list();
+                  String[] contenteSorted = new String[contente.length];
 
+                  for (String conte : contente){
+                     int numberDisk = Integer.parseInt(conte.replaceAll("DISK",""));
+                     contenteSorted[numberDisk] = conte;
+                  }
+                  
                   if(contente.length!=numNodos){
                      numRejected=numNodos-1;
                   }
 
-                  for (String conte : contente){
+                  for (String conte : contenteSorted){
                      int numberDisk = Integer.parseInt(conte.replaceAll("DISK",""));
                      if(numberDisk != x){
                         numRejected=x;
@@ -194,14 +213,19 @@ public class ServerUDP {
 
                   File diskToDelete = new File(pathFiles);
                   String[] contents = diskToDelete.list();
-                  int j = 0, sizeName=0;
+                  String number;
                   for (String content : contents){
                      if(!content.contains("DISK") && !content.contains("gitkeep") && !content.contains("fileDecode") && !content.contains("fileEncode") && !content.contains("encode")){
-                        sizeName= content.length();
-                        j = Integer.parseInt(content.substring(sizeName-5,sizeName-4));
+                        number = content.replace(".txt","");
+
+                        if(content.contains("fileParity")){
+                           number = number.replaceAll("fileParity","");
+                        }else{
+                           number = number.replaceAll("file","");
+                        }
 
                         Path sourcepath = Paths.get(pathFiles+content);
-                        Path destinationepath = Paths.get(pathFiles+"DISK"+j+"\\"+content);
+                        Path destinationepath = Paths.get(pathFiles+"DISK"+number+"\\"+content);
                         Files.copy(sourcepath, destinationepath, StandardCopyOption.REPLACE_EXISTING);
                         new File(pathFiles+content).delete();
                      }
@@ -254,8 +278,6 @@ public class ServerUDP {
                            }
                         }
                         new File(pathFiles+"DISK"+a).delete();
-                        //FileUtils.cleanDirecotory();-
-
                      }
                   }
                }
