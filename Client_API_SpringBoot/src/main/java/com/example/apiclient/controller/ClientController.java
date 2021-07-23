@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -38,6 +40,7 @@ public class ClientController {
     public List<Book> getAll() {
         return service.listAll();
     }
+    InetAddress currentClientIP;
 
     /**
      * Receive file from FrontEnd_Angular and upload to Controller_Node_Java
@@ -51,12 +54,15 @@ public class ClientController {
         try {
             try {
 
-
                 Send send = new Send();
                 send.sendFile(file, numNodes);
                 Book book= new Book();
                 book.setName(file.getOriginalFilename());
-                book.setAuthor(file.getName());
+
+                String owner = InetAddress.getLocalHost()+"";
+                owner = owner.substring(0,owner.indexOf("/"));
+
+                book.setAuthor(owner);
                 java.util.Date utilDate = new java.util.Date();
                 java.sql.Date sDate = new java.sql.Date(utilDate.getTime());
                 book.setDate(sDate);
