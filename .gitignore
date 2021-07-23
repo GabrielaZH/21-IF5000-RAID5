@@ -1,0 +1,8 @@
+node_modules/
+
+filesReceive/*
+files/*
+
+!filesReceive/.gitkeep
+
+!files/.gitkeep

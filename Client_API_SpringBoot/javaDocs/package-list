@@ -1,0 +1,6 @@
+com.example.apiclient
+com.example.apiclient.controller
+com.example.apiclient.huffman
+com.example.apiclient.model
+com.example.apiclient.repository
+com.example.apiclient.service

@@ -1,0 +1,49 @@
+<div id="wrapper">
+    <app-header></app-header>
+
+    <div class="container content">
+
+        <router-outlet></router-outlet>
+
+        <form>
+            <div class="formulario__grupo col-md-12">
+                <label class="form-label mt-5">File (.txt)</label>
+                <input id="imagenFile" (change)="selectFile($event)"
+                    onChange="document.getElementById().src = window.URL.createObjectURL(this.files[0])" type="file"
+                    title="TXT" class="form-control mt-2 w-50" name="image" accept="file/.txt">
+                <input (keyup)="onKey($event)" [placeholder]="placeholder" class="form-control mt-2 w-25">
+            </div>
+
+
+            <div class="mt-2 col-md-6">
+                <button type="button" (click)="upload()" class="btn btn-success">Subir</button>
+            </div>
+        </form>
+        <br>
+        <table datatable [dtOptions]="dtOptions" class="table table-striped text-center mt-3">
+            <thead class="text-light" style="background-color: #3da1ee;">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Fecha</th>
+                    <th>Autor</th>
+                    <th>Nodos</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let book of bookList | async">
+                    <td>{{ book.name}}</td>
+                    <td>{{ book.date}}</td>
+                    <td>{{ book.author}}</td>
+                    <td>{{ book.nodes}}</td>
+
+                    <td>
+                        <button class="btn-secondary btn" (click)="request(book.name,book.nodes)" title="Descargar"><i class="fas fa-file-download"
+                                style="color:white"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <app-footer></app-footer>
+</div>
